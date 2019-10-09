@@ -23,6 +23,80 @@ for (let i = 0; i < romVals.length / 2; i++) {
 
 const MRV = maxVal;
 
+const SUITS = {
+    C: 'Club',
+    S: 'Spade',
+    H: 'Heart',
+    D: 'Diamond'
+}
+
+const CARDVALS = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K'];
+
+//Helper Class for playing cards
+function Card(suitIndex = 0, numIndex = 0) {
+    this.numI = numInd;
+    this.suitI = suitInd;
+    this.num = Numbers[numI];
+    this.suit = Suits[suitI];
+
+    this.name = function () {
+        return num + suit;
+    }
+}
+
+public final class Deck {
+    private ArrayList<Card> cards;
+
+    public Deck() {
+        cards = new ArrayList<Card>();
+        for (int i = 0; i < Numbers.length; i++) {
+            for (int j = 0; j < Suits.length; j++) {
+                cards.add(new Card(i, j));
+            }
+        }
+    }
+
+    public Card takeTopCard() {
+        Card top = cards.get(0);
+        cards.remove(0);
+        return top;
+    }
+
+    public Card takeNthCard(int n) {
+        Card nth = cards.get(n);
+        cards.remove(n);
+        return nth;
+    }
+
+    public Card getTopCard() {
+        return cards.get(0);
+    }
+
+    public Card getNthCard(int n) {
+        return cards.get(n);
+    }
+
+    public void addCard(Card newCard) {
+        cards.add(newCard);
+    }
+
+    public void addCards(ArrayList<Card> newCards) {
+    cards.addAll(newCards);
+}
+  
+  public void shuffle(){
+    cards = m.randomize(cards);
+}
+  
+  public ArrayList < Card > getCards(){
+    return cards;
+}
+  
+  public void setDeck(ArrayList < Card > newCards){
+    cards = new ArrayList<Card>(newCards);
+}
+}
+
 //Turns a passed in time (in seconds) into a formatted string with days, hours, minutes, and seconds
 function prettyTime(time) {
     let seconds = time;
