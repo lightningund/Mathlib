@@ -32,6 +32,20 @@ const SUITS = {
 
 const CARDVALS = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K'];
 
+function randomize(inArr){
+    let indices = [];
+    for (let i = 0; i < inArr.size(); i++) {
+        indices.push(i);
+    }
+    let outArr = [];
+    for (let i = 0; i < inArr.size(); i++) {
+        let index = floor(random(indices.length));
+        outArr.push(inArr[indices[index]]);
+        indices.splice(index);
+    }
+    return outArr;
+}
+
 //Helper Class for playing cards
 function Card(suitIndex = 0, numIndex = 0) {
     this.numI = numInd;
@@ -44,57 +58,54 @@ function Card(suitIndex = 0, numIndex = 0) {
     }
 }
 
-public final class Deck {
-    private ArrayList<Card> cards;
-
-    public Deck() {
-        cards = new ArrayList<Card>();
-        for (int i = 0; i < Numbers.length; i++) {
-            for (int j = 0; j < Suits.length; j++) {
-                cards.add(new Card(i, j));
-            }
+function Deck(){
+    this.cards = [];
+    for (let i = 0; i < CARDVALS.length; i++) {
+        for (let j = 0; j < SUITS.length; j++) {
+            this.cards.append(new Card(i, j));
         }
     }
 
-    public Card takeTopCard() {
-        Card top = cards.get(0);
-        cards.remove(0);
+    this.takeTopCard = function() {
+        let top = this.cards[0]
+        this.cards.splice(0);
         return top;
     }
 
-    public Card takeNthCard(int n) {
-        Card nth = cards.get(n);
-        cards.remove(n);
+   this.takeNthCard = function(n) {
+        let nth = this.cards[n]
+       this.cards.splice(n);
         return nth;
     }
 
-    public Card getTopCard() {
-        return cards.get(0);
+    this.getTopCard = function() {
+        return this.cards[0];
     }
 
-    public Card getNthCard(int n) {
-        return cards.get(n);
+    this.getNthCard = function(n) {
+        return this.cards[n];
     }
 
-    public void addCard(Card newCard) {
-        cards.add(newCard);
+    this.addCard = function(newCard) {
+        this.cards.append(newCard);
     }
 
-    public void addCards(ArrayList<Card> newCards) {
-    cards.addAll(newCards);
-}
-  
-  public void shuffle(){
-    cards = m.randomize(cards);
-}
-  
-  public ArrayList < Card > getCards(){
-    return cards;
-}
-  
-  public void setDeck(ArrayList < Card > newCards){
-    cards = new ArrayList<Card>(newCards);
-}
+    this.addCards = function(newCards) {
+        this.cards.push(...newCards);
+    }
+    
+    this.shuffle = function(){
+        this.cards = randomize(this.cards);
+        return this.cards;
+    }
+    
+    this.getCards = function(){
+        return this.cards;
+    }
+    
+    this.setDeck = function(newCards){
+        this.cards = newCards;
+    }
 }
 
 //Turns a passed in time (in seconds) into a formatted string with days, hours, minutes, and seconds
