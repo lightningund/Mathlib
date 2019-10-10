@@ -69,7 +69,7 @@ function Deck() {
 
     this.takeTopCard = function () {
         let top = this.cards[0]
-        this.cards.splice(0);
+        this.cards.splice(0, 1);
         return top;
     }
 
