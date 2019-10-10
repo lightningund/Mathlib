@@ -27,6 +27,9 @@ const SUITS = ['C', 'S', 'H', 'D'];
 
 const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
+let cardBack = new Image();
+cardBack.src = "https://javakid0826.github.io/Methlib-js/Images/Back.png";
+
 function randomize(inArr) {
     let indices = [];
     for (let i = 0; i < inArr.size(); i++) {
