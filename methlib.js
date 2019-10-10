@@ -23,9 +23,9 @@ for (let i = 0; i < romVals.length / 2; i++) {
 
 const MRV = maxVal;
 
-const SUITS = ['Club', 'Spade', 'Heart', 'Diamond'];
+const SUITS = ['C', 'S', 'H', 'D'];
 
-const CARDVALS = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K'];
+const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
 function randomize(inArr) {
     let indices = [];
@@ -48,6 +48,8 @@ function Card(suitIndex = 0, numIndex = 0) {
     this.num = CARDVALS[numIndex];
     this.suit = SUITS[suitIndex];
     this.flipped = false;
+    this.sprite = new Image(20, 40);
+    this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.num + this.suit + ".png";
 
     this.name = function () {
         return num + suit;
