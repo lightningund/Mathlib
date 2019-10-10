@@ -55,9 +55,9 @@ function Card(suitIndex = 0, numIndex = 0) {
 
 function Deck() {
     this.cards = [];
-    
-    for (let i = 0; i < CARDVALS.length; i++) {
-        for (let j = 0; j < SUITS.length; j++) {
+
+    for (let i = 0; i < SUITS.length; i++) {
+        for (let j = 0; j < CARDVALS.length; j++) {
             this.cards.append(new Card(i, j));
         }
     }
