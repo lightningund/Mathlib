@@ -1,7 +1,7 @@
 /*
  * Original Author: Ben Love
  * Last Editor: Ben Love
- * Last Edited: 30/09/19
+ * Last Edited: 09/10/19
  * Purpose: To store any and all helper functions you could need
  * See the README for styling rules
  */
@@ -23,16 +23,11 @@ for (let i = 0; i < romVals.length / 2; i++) {
 
 const MRV = maxVal;
 
-const SUITS = {
-    C: 'Club',
-    S: 'Spade',
-    H: 'Heart',
-    D: 'Diamond'
-}
+const SUITS = ['Club', 'Spade', 'Heart', 'Diamond'];
 
 const CARDVALS = ['A', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'Q', 'K'];
 
-function randomize(inArr){
+function randomize(inArr) {
     let indices = [];
     for (let i = 0; i < inArr.size(); i++) {
         indices.push(i);
@@ -48,62 +43,63 @@ function randomize(inArr){
 
 //Helper Class for playing cards
 function Card(suitIndex = 0, numIndex = 0) {
-    this.numI = numInd;
-    this.suitI = suitInd;
-    this.num = Numbers[numI];
-    this.suit = Suits[suitI];
+    this.numI = numIndex;
+    this.suitI = suitIndex;
+    this.num = CARDVALS[numIndex];
+    this.suit = SUITS[suitIndex];
 
     this.name = function () {
         return num + suit;
     }
 }
 
-function Deck(){
+function Deck() {
     this.cards = [];
+    
     for (let i = 0; i < CARDVALS.length; i++) {
         for (let j = 0; j < SUITS.length; j++) {
             this.cards.append(new Card(i, j));
         }
     }
 
-    this.takeTopCard = function() {
+    this.takeTopCard = function () {
         let top = this.cards[0]
         this.cards.splice(0);
         return top;
     }
 
-   this.takeNthCard = function(n) {
+    this.takeNthCard = function (n) {
         let nth = this.cards[n]
-       this.cards.splice(n);
+        this.cards.splice(n);
         return nth;
     }
 
-    this.getTopCard = function() {
+    this.getTopCard = function () {
         return this.cards[0];
     }
 
-    this.getNthCard = function(n) {
+    this.getNthCard = function (n) {
         return this.cards[n];
     }
 
-    this.addCard = function(newCard) {
+    this.addCard = function (newCard) {
         this.cards.append(newCard);
     }
 
-    this.addCards = function(newCards) {
+    this.addCards = function (newCards) {
         this.cards.push(...newCards);
     }
-    
-    this.shuffle = function(){
+
+    this.shuffle = function () {
         this.cards = randomize(this.cards);
         return this.cards;
     }
-    
-    this.getCards = function(){
+
+    this.getCards = function () {
         return this.cards;
     }
-    
-    this.setDeck = function(newCards){
+
+    this.setDeck = function (newCards) {
         this.cards = newCards;
     }
 }
