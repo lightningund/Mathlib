@@ -47,9 +47,14 @@ function Card(suitIndex = 0, numIndex = 0) {
     this.suitI = suitIndex;
     this.num = CARDVALS[numIndex];
     this.suit = SUITS[suitIndex];
+    this.flipped = false;
 
     this.name = function () {
         return num + suit;
+    }
+
+    this.flip = function() {
+        this.flipped = this.flipped ? false : true;
     }
 }
 
@@ -58,7 +63,7 @@ function Deck() {
 
     for (let i = 0; i < SUITS.length; i++) {
         for (let j = 0; j < CARDVALS.length; j++) {
-            this.cards.append(new Card(i, j));
+            this.cards.push(new Card(i, j));
         }
     }
 
@@ -83,7 +88,7 @@ function Deck() {
     }
 
     this.addCard = function (newCard) {
-        this.cards.append(newCard);
+        this.cards.push(newCard);
     }
 
     this.addCards = function (newCards) {
