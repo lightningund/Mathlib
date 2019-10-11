@@ -375,12 +375,24 @@ function carmichael(n) {
 }
 
 //Return a truncated version of a value between the lower and upper limits
-function limit(limitee, lowerLimit = -1, upperLimit = 1) {
-    if (limitee < lowerLimit) {
-        return lowerLimit;
+function limit(limitee, a, b) {
+    let min, max;
+    if(arguments.length === 1){
+        min = 0;
+        max = 1;
+    } else if(arguments.length === 2){
+        min = 0;
+        max = a;
+    } else {
+        min = a;
+        max = b;
     }
-    if (limitee > upperLimit) {
-        return upperLimit;
+
+    if (limitee < min) {
+        return min;
+    }
+    if (limitee > max) {
+        return max;
     }
     return limitee;
 }
