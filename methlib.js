@@ -29,6 +29,10 @@ const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', '
 
 let cardBack = new Image();
 cardBack.src = "https://javakid0826.github.io/Methlib-js/Images/Back.png";
+let cardHighlight = new Image();
+cardHighlight.src = "https://javakid0826.github.io/Methlib-js/Images/Highlight.png";
+let cardOutline = new Image();
+cardOutline.src = "https://javakid0826.github.io/Methlib-js/Images/Outline.png";
 
 function randomize(inArr) {
     let outArr = [];
