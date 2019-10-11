@@ -1,7 +1,7 @@
 /*
  * Original Author: Ben Love
  * Last Editor: Ben Love
- * Last Edited: 09/10/19
+ * Last Edited: 10/10/19
  * Purpose: To store any and all helper functions you could need
  * See the README for styling rules
  */
@@ -31,15 +31,11 @@ let cardBack = new Image();
 cardBack.src = "https://javakid0826.github.io/Methlib-js/Images/Back.png";
 
 function randomize(inArr) {
-    let indices = [];
-    for (let i = 0; i < inArr.size(); i++) {
-        indices.push(i);
-    }
     let outArr = [];
-    for (let i = 0; i < inArr.size(); i++) {
-        let index = floor(random(indices.length));
-        outArr.push(inArr[indices[index]]);
-        indices.splice(index);
+    let numLoops = inArr.length;
+    for (let i = 0; i < numLoops; i++) {
+        let index = Math.floor(random(inArr.length));
+        outArr[i] = inArr.splice(index, 1)[0];
     }
     return outArr;
 }
@@ -52,7 +48,7 @@ function Card(suitIndex = 0, numIndex = 0) {
     this.suit = SUITS[suitIndex];
     this.flipped = false;
     this.sprite = new Image(20, 40);
-    this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.num + this.suit + ".png";
+    this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
 
     this.name = function () {
         return num + suit;
@@ -60,6 +56,7 @@ function Card(suitIndex = 0, numIndex = 0) {
 
     this.flip = function() {
         this.flipped = this.flipped ? false : true;
+        return this;
     }
 }
 
@@ -102,7 +99,7 @@ function Deck() {
 
     this.shuffle = function () {
         this.cards = randomize(this.cards);
-        return this.cards;
+        return this;
     }
 
     this.getCards = function () {
@@ -468,23 +465,26 @@ function Vector2(x = 0, y = 0) {
 
     //Add another vector to this one and return the result
     this.add = function (addend) {
-        this.x += addend.x;
-        this.y += addend.y;
-        return this;
+        let newVec = this;
+        newVec.x += addend;
+        newVec.y += addend;
+        return newVec;
     }
 
     //Subtract another vector from this one and return the result
     this.sub = function (subtrahend) {
-        this.x -= subtrahend.x;
-        this.y -= subtrahend.y;
-        return this;
+        let newVec = this;
+        newVec.x -= subtrahend;
+        newVec.y -= subtrahend;
+        return newVec;
     }
 
     //Scale this vector by a number and return the result
     this.scale = function (scalar) {
-        this.x *= scalar;
-        this.y *= scalar;
-        return this;
+        let newVec = this;
+        newVec.x *= scalar;
+        newVec.y *= scalar;
+        return newVec;
     }
 
     //Return the length of this vector according to c^2 = a^2 + b^2
@@ -494,8 +494,7 @@ function Vector2(x = 0, y = 0) {
 
     //Normalize this vector (scale it so it's length is 1) and return the result
     this.normalize = function () {
-        this.scale(1 / this.length());
-        return this;
+        return this.scale(1 / this.length());
     }
 
     //Limit this vector to a rectangle defined by the lower and upper limits forming the corners and return the result
