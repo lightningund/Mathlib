@@ -374,44 +374,56 @@ function carmichael(n) {
     }
 }
 
-//Return a truncated version of a value between the lower and upper limits
-function limit(limitee, a, b) {
+//Return the minimum and maximum according to the number of arguments provided
+function minAndMax(argLength, a, b, minDef, maxDef){
     let min, max;
-    if(arguments.length === 1){
-        min = 0;
-        max = 1;
-    } else if(arguments.length === 2){
-        min = 0;
+
+    if(argLength === 1){
+        min = minDef;
+        max = maxDef;
+    } else if(argLength === 2){
+        min = minDef;
         max = a;
     } else {
         min = a;
         max = b;
     }
+    return [min, max];
+}
 
-    if (limitee < min) {
-        return min;
+//Return a truncated version of a value between the lower and upper limits
+function limit(limitee, a, b) {
+    let minMax = minAndMax(arguments.length, a, b, 0, 1);
+
+    if (limitee < minMax[0]) {
+        return minMax[0];
     }
-    if (limitee > max) {
-        return max;
+    if (limitee > minMax[1]) {
+        return minMax[1];
     }
     return limitee;
 }
 
 //Return a boolean of whether or not a given value would be truncated with the given lower and upper limits
-function isLimited(limitee, lowerLimit = -1, upperLimit = 1) {
-    return (limitee < lowerLimit || limitee > upperLimit);
+function isLimited(limitee, a, b) {
+    let minMax = minAndMax(arguments.length, a, b, 0, 1);
+
+    return (limitee < minMax[0] || limitee > minMax[1]);
 }
 
 //Return a truncated version of a vector given a lower and upper limit as vectors which form a rectangle that we truncate it into
-function vectorLimit(limitee, lowerLimit = new Vector2(-1, -1), upperLimit = new Vector2(1, 1)) {
-    limitee.x = limit(limitee.x, lowerLimit.x, upperLimit.x);
-    limitee.y = limit(limitee.y, lowerLimit.y, upperLimit.y);
+function vectorLimit(limitee, a, b) {
+    let minMax = minAndMax(arguments.length, a, b, new Vector2(0, 0), new Vector2(1, 1));
+
+    limitee.x = limit(limitee.x, minMax[0].x, minMax[1].x);
+    limitee.y = limit(limitee.y, minMax[0].y, minMax[1].y);
     return limitee;
 }
 
 //Return a boolean of whether or not a given vector would be truncated with the given lower and upper limits
-function isVectorLimited(limitee, lowerLimit = new Vector2(-1, -1), upperLimit = new Vector2(1, 1)) {
-    return (isLimited(limitee.x, lowerLimit.x, upperLimit.x) || isLimited(limitee.y, lowerLimit.y, upperLimit.y));
+function isVectorLimited(limitee, a, b) {
+    let minMax = minAndMax(arguments.length, a, b, new Vector2(0, 0), new Vector2(1, 1));
+    return (isLimited(limitee.x, minMax[0].x, minMax[1].x) || isLimited(limitee.y, minMax[0].y, minMax[1].y));
 }
 
 //Check if a point overlaps a rectangle
@@ -454,8 +466,9 @@ function HSVtoRGB(h, s, v) {
 
 //Return a random value between the maximum and minimum value
 function random(a = 0, b = 1) {
-    let max = arguments.length === 1 ? a : b;
-    let min = arguments.length === 1 ? 0 : a;
+    let min, max;
+    minAndMax(arguments.length, a, b, 0, 1, min, max);
+
     return (Math.random() * (max - min)) + min;
 }
 
@@ -482,16 +495,16 @@ function Vector2(x = 0, y = 0) {
     //Add another vector to this one and return the result
     this.add = function (addend) {
         let newVec = this;
-        newVec.x += addend;
-        newVec.y += addend;
+        newVec.x += addend.x;
+        newVec.y += addend.y;
         return newVec;
     }
 
     //Subtract another vector from this one and return the result
     this.sub = function (subtrahend) {
         let newVec = this;
-        newVec.x -= subtrahend;
-        newVec.y -= subtrahend;
+        newVec.x -= subtrahend.x;
+        newVec.y -= subtrahend.y;
         return newVec;
     }
 
@@ -503,7 +516,7 @@ function Vector2(x = 0, y = 0) {
         return newVec;
     }
 
-    //Return the length of this vector according to c^2 = a^2 + b^2
+    //Return the length of this vector according to c = sqrt(a^2 + b^2)
     this.length = function () {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
@@ -514,8 +527,10 @@ function Vector2(x = 0, y = 0) {
     }
 
     //Limit this vector to a rectangle defined by the lower and upper limits forming the corners and return the result
-    this.limit = function (lowerLimit = new Vector2(-1, -1), upperLimit = new Vector2(1, 1)) {
-        return vectorLimit(this, lowerLimit, upperLimit);
+    this.limit = function (a, b) {
+        let min, max;
+        minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1), min, max);
+        return vectorLimit(this, min, max);
     }
 }
 
@@ -527,20 +542,20 @@ function Collider(x = 0, y = 0, w = 20, h = 20) {
     this.acc = new Vector2();
 
     this.wallLimit = function (bounds) {
-        if (isLimited(this.pos.x, 0, bounds.x)) {
+        if (isLimited(this.pos.x, bounds.x)) {
             this.vel.x = 0;
         }
-        if (isLimited(this.pos.y, 0, bounds.y)) {
+        if (isLimited(this.pos.y, bounds.y)) {
             this.vel.y = 0;
         }
-        this.pos.limit({ x: 0, y: 0 }, bounds.sub(this.size));
+        this.pos = vectorLimit(this.pos, bounds.sub(this.size));
     }
 
     this.update = function () {
-        this.pos.add(this.vel);
-        this.vel.add(this.acc);
-        this.acc.scale(0);
-        this.vel.scale(0.9);
+        this.pos = this.pos.add(this.vel);
+        this.vel = this.vel.add(this.acc);
+        this.acc = this.acc.scale(0);
+        this.vel = this.vel.scale(0.9);
     }
 }
 
