@@ -466,10 +466,9 @@ function HSVtoRGB(h, s, v) {
 
 //Return a random value between the maximum and minimum value
 function random(a = 0, b = 1) {
-    let min, max;
-    minAndMax(arguments.length, a, b, 0, 1, min, max);
+    let minMax = minAndMax(arguments.length + 1, a, b, 0, 1);
 
-    return (Math.random() * (max - min)) + min;
+    return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
 }
 
 //Returns the string of the corresponding font size because css is stupid and doesn't let you just pass in a number for font size
