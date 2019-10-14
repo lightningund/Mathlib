@@ -1,7 +1,7 @@
 /*
  * Original Author: Ben Love
  * Last Editor: Ben Love
- * Last Edited: 10/10/19
+ * Last Edited: 14/10/19
  * Purpose: To store any and all helper functions you could need
  * See the README for styling rules
  */
