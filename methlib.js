@@ -1,7 +1,7 @@
 /*
  * Original Author: Ben Love
  * Last Editor: Ben Love
- * Last Edited: 14/10/19
+ * Last Edited: 15/10/19
  * Purpose: To store any and all helper functions you could need
  * See the README for styling rules
  */
@@ -23,8 +23,18 @@ for (let i = 0; i < romVals.length / 2; i++) {
 
 const MRV = maxVal;
 
-const SUITS = ['C', 'S', 'H', 'D'];
+const BLACK = new Color(0, 0, 0, 255);
+const GREY = new Color(128, 128, 128, 255);
+const WHITE = new Color(255, 255, 255, 255);
+const RED = new Color(255, 0, 0, 255);
+const GREEN = new Color(0, 255, 0, 255);
+const BLUE = new Color(0, 0, 255, 255);
+const YELLOW = new Color(255, 255, 0, 255);
+const PURPLE = new Color(255, 0, 255, 255);
+const CYAN = new Color(0, 255, 255, 255);
+const ORANGE = new Color(255, 128, 0, 255);
 
+const SUITS = ['C', 'S', 'H', 'D'];
 const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
 let cardBack = new Image();
@@ -33,6 +43,170 @@ let cardHighlight = new Image();
 cardHighlight.src = "https://javakid0826.github.io/Methlib-js/Images/Highlight.png";
 let cardOutline = new Image();
 cardOutline.src = "https://javakid0826.github.io/Methlib-js/Images/Outline.png";
+
+function Color(r, g, b, a){
+    this.r, this.g, this.b, this.a;
+    if(arguments.length == 0){
+        this.r = 0;
+        this.g = 0;
+        this.b = 0;
+        this.a = 255;
+    } else if(arguments.length == 1){
+        this.r = r;
+        this.g = r;
+        this.b = r;
+        this.a = 255;
+    } else if(arguments.length == 2){
+        this.r = r;
+        this.g = r;
+        this.b = r;
+        this.a = g;
+    } else if(arguments.length == 3){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = 255;
+    } else if(arguments.length == 4){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+    }
+
+    this.getRGBFunc = function(){
+        return "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+    }
+    this.getRGBHex = function(){
+        let hexR = this.r.toString(16);
+        if(hexR.length == 1){
+            hexR.unshift(" ");
+        }
+        let hexG = this.g.toString(16);
+        if(hexG.length == 1){
+            hexG.unshift(" ");
+        }
+        let hexB = this.b.toString(16);
+        if(hexB.length == 1){
+            hexB.unshift(" ");
+        }
+        return "#" + hexR + hexG + hexB;
+    }
+
+    this.getRGBAFunc = function(){
+        return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
+    }
+    this.getRGBAHex = function(){
+        let hexR = this.r.toString(16);
+        if(hexR.length == 1){
+            hexR = "0" + hexR
+        }
+        let hexG = this.g.toString(16);
+        if(hexG.length == 1){
+            hexG = "0" + hexG
+        }
+        let hexB = this.b.toString(16);
+        if(hexB.length == 1){
+            hexB = "0" + hexB
+        }
+        let hexA = this.a.toString(16);
+        if(hexA.length == 1){
+            hexA = "0" + hexA
+        }
+        return "#" + hexR + hexG + hexB + hexA;
+    }
+}
+
+//Tetris Piece
+function Piece(parts) {
+	this.p = parts;
+};
+
+//Tetris Piece with all 4 rotations
+function PieceF(pieceRots, color) {
+	this.rot = pieceRots;
+	this.col = color;
+};
+
+function Cell(isOn = false, color = new Color(), prevColor = new Color()) {
+	this.on = isOn;
+	this.col = color;
+	this.prevCol = prevColor;
+};
+
+//Tetris Pieces
+const pieces =
+[
+    //Line Piece
+	new PieceF(
+		[
+			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(3, 2)]),
+			new Piece([new Vector2(2, 0), new Vector2(2, 1), new Vector2(2, 2), new Vector2(2, 3)]),
+			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(3, 2)]),
+			new Piece([new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)])
+		],
+		CYAN
+	),
+    //L Piece 1
+    new PieceF(
+        [
+            new Piece([new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)]),
+            new Piece([new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3), new Vector2(2, 3)]),
+            new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(0, 3)]),
+            new Piece([new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)])
+        ],
+        ORANGE
+    ),
+    //L Piece 2
+    new PieceF(
+        [
+            new Piece([new Vector2(0, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)]),
+            new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(1, 3)]),
+            new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)]),
+            new Piece([new Vector2(2, 1), new Vector2(2, 2), new Vector2(1, 3), new Vector2(2, 3)])
+        ],
+        BLUE
+    ),
+    //Square Piece
+    new PieceF(
+        [
+            new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)]),
+            new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)]),
+            new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)]),
+            new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)])
+        ],
+        YELLOW
+    ),
+    //Z Piece 1
+    new PieceF(
+        [
+            new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2)]),
+            new Piece([new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)]),
+            new Piece([new Vector2(1, 2), new Vector2(2, 2), new Vector2(0, 3), new Vector2(1, 3)]),
+            new Piece([new Vector2(0, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3)])
+        ],
+        GREEN
+    ),
+    //Z Piece 2
+    new PieceF(
+        [
+            new Piece([new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)]),
+            new Piece([new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)]),
+            new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3), new Vector2(2, 3)]),
+            new Piece([new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(0, 3)])
+        ],
+        RED
+    ),
+    //T Piece
+    new PieceF(
+        [
+            new Piece([new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)]),
+            new Piece([new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)]),
+            new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)]),
+            new Piece([new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3)])
+        ],
+        PURPLE
+    )
+];
 
 function randomize(inArr) {
     let outArr = [];
@@ -527,9 +701,8 @@ function Vector2(x = 0, y = 0) {
 
     //Limit this vector to a rectangle defined by the lower and upper limits forming the corners and return the result
     this.limit = function (a, b) {
-        let min, max;
-        minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1), min, max);
-        return vectorLimit(this, min, max);
+        let minMax = minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1));
+        return vectorLimit(this, minMax[0], minMax[1]);
     }
 }
 
