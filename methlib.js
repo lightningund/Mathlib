@@ -1,7 +1,7 @@
 /*
  * Original Author: Ben Love
  * Last Editor: Ben Love
- * Last Edited: 15/10/19
+ * Last Edited: 28/10/19
  * Purpose: To store any and all helper functions you could need
  * See the README for styling rules
  */
@@ -607,7 +607,7 @@ function pointOverlap(p, r) {
 
 //Check if two rectangles overlap
 function overlap(a, b) {
-    return !(a.pos.x > b.pos.x + b.size.x || a.pos.x + a.size.x < b.pos.x || a.pos.y > b.pos.y + b.size.x || a.pos.y + a.size.y < b.pos.y);
+    return !(a.pos.x >= b.pos.x + b.size.x || a.pos.x + a.size.x =< b.pos.x || a.pos.y >= b.pos.y + b.size.x || a.pos.y + a.size.y =< b.pos.y);
 }
 
 //Convert a color in HSV format to RGB format
