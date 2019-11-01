@@ -607,7 +607,7 @@ function pointOverlap(p, r) {
 
 //Check if two rectangles overlap
 function overlap(a, b) {
-    return !(a.pos.x >= b.pos.x + b.size.x || a.pos.x + a.size.x =< b.pos.x || a.pos.y >= b.pos.y + b.size.x || a.pos.y + a.size.y =< b.pos.y);
+    return !((a.pos.x >= b.pos.x + b.size.x) || (a.pos.x + a.size.x <= b.pos.x) || (a.pos.y >= b.pos.y + b.size.x) || (a.pos.y + a.size.y <= b.pos.y));
 }
 
 //Convert a color in HSV format to RGB format
