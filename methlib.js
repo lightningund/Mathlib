@@ -1,26 +1,21 @@
 /*
 * Original Author: Ben Love
 * Last Editor: Ben Love
-* Last Edited: 06/12/19
+* Last Edited: 08/12/19
 * Purpose: To store any and all helper functions you could need
 * See the README for styling rules
 */
 
 //Roman Numerals Characters
 const romChars = ['I', 'V', 'X', 'L', 'D', 'C', 'M', 'v', 'x', 'l', 'd', 'c', 'm'];
-module.exports.romChars = romChars;
 
 //Their corresponding values
 const romVals = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000];
-module.exports.romVals = romVals;
 
 //Constants
 const E = 2.7182818;
-module.exports.E = E;
 const PI = 3.1415926;
-module.exports.PI = PI;
 const PHI = 1.6180339;
-module.exports.PHI = PHI;
 
 let maxVal = romVals[romVals.length - 1] * 3;
 for (let i = 0; i < romVals.length / 2; i++) {
@@ -31,13 +26,10 @@ const MRV = maxVal;
 
 let cardBack = new Image();
 cardBack.src = "https://javakid0826.github.io/Methlib-js/Images/Back.png";
-module.exports.cardBack = cardBack;
 let cardHighlight = new Image();
 cardHighlight.src = "https://javakid0826.github.io/Methlib-js/Images/Highlight.png";
-module.exports.cardHighlight = cardHighlight;
 let cardOutline = new Image();
 cardOutline.src = "https://javakid0826.github.io/Methlib-js/Images/Outline.png";
-module.exports.cardOutline = cardOutline;
 
 //Color
 const Color = class Color {
@@ -113,33 +105,20 @@ const Color = class Color {
 		}
 	}
 }
-module.exports.Color = Color;
 
 const BLACK = new Color(0, 0, 0, 255);
-module.exports.BLACK = BLACK;
 const GREY = new Color(128, 128, 128, 255);
-module.exports.GREY = GREY;
 const WHITE = new Color(255, 255, 255, 255);
-module.exports.WHITE = WHITE;
 const RED = new Color(255, 0, 0, 255);
-module.exports.RED = RED;
 const GREEN = new Color(0, 255, 0, 255);
-module.exports.GREEN = GREEN;
 const BLUE = new Color(0, 0, 255, 255);
-module.exports.BLUE = BLUE;
 const YELLOW = new Color(255, 255, 0, 255);
-module.exports.YELLOW = YELLOW;
 const PURPLE = new Color(255, 0, 255, 255);
-module.exports.PURPLE = PURPLE;
 const CYAN = new Color(0, 255, 255, 255);
-module.exports.CYAN = CYAN;
 const ORANGE = new Color(255, 128, 0, 255);
-module.exports.ORANGE = ORANGE;
 
 const SUITS = ['C', 'S', 'H', 'D'];
-module.exports.SUITS = SUITS;
 const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-module.exports.CARDVALS = CARDVALS;
 
 //Tetris Piece
 const Piece = class Piece {
@@ -147,7 +126,6 @@ const Piece = class Piece {
 		this.p = parts;
 	}
 }
-module.exports.Piece = Piece;
 
 //Tetris Piece with all 4 rotations
 const PieceF = class PieceF {
@@ -156,7 +134,6 @@ const PieceF = class PieceF {
 		this.col = color;
 	}
 }
-module.exports.PieceF = PieceF;
 
 //Honestly this was just for Tetris I don't know what purpose this serves otherwise
 const Cell = class Cell {
@@ -166,7 +143,6 @@ const Cell = class Cell {
 		this.prevCol = prevColor;
 	}
 }
-module.exports.Cell = Cell;
 
 //Helper class for 2D vectors
 const Vector2 = class Vector2 {
@@ -220,7 +196,6 @@ const Vector2 = class Vector2 {
 		}
 	}
 }
-module.exports.Vector2 = Vector2;
 
 //Helper class for a rectangular 2D collider
 const Collider = class Collider {
@@ -305,7 +280,6 @@ const Collider = class Collider {
 		}
 	}
 }
-module.exports.Collider = Collider;
 
 //Helper class for an arbitrary button
 const Button = class Button {
@@ -319,7 +293,6 @@ const Button = class Button {
 		}
 	}
 }
-module.exports.Button = Button;
 
 //Helper Class for playing cards
 const Card = class Card {
@@ -342,7 +315,6 @@ const Card = class Card {
 		}
 	}
 }
-module.exports.Card = Card;
 
 //Helper Class for a deck of playing cards
 const Deck = class Deck {
@@ -397,7 +369,6 @@ const Deck = class Deck {
 		}
 	}
 }
-module.exports.Deck = Deck;
 
 //Tetris Pieces
 
@@ -474,7 +445,6 @@ const pieces =
 		PURPLE
 	)
 ];
-module.exports.pieces = pieces;
 
 const randomize = (inArr) => {
 	let outArr = [];
@@ -485,7 +455,6 @@ const randomize = (inArr) => {
 	}
 	return outArr;
 }
-module.exports.randomize = randomize;
 
 //Turns a passed in time (in seconds) into a formatted string with days, hours, minutes, and seconds
 const prettyTime = (time) => {
@@ -521,13 +490,11 @@ const prettyTime = (time) => {
 
 	return out_string;
 }
-module.exports.prettyTime = prettyTime;
 
 //Return the logarithm of a number with an arbitrary base
 const logb = (number, base) => {
 	return (Math.log(number) / Math.log(base));
 }
-module.exports.logb = logb;
 
 //Generate an MLA Citation
 const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
@@ -542,7 +509,6 @@ const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
 
 	return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
 }
-module.exports.MLA_Citation = MLA_Citation;
 
 //Generate the Roman numeral equivalent of a given number
 const romanNumerals = (number) => {
@@ -579,7 +545,6 @@ const romanNumerals = (number) => {
 		return romanNum;
 	}
 }
-module.exports.romanNumerals = romanNumerals;
 
 //Roman numeral tester
 const romNumTest = () => {
@@ -590,7 +555,6 @@ const romNumTest = () => {
 		}
 	}
 }
-module.exports.romNumTest = romNumTest;
 
 //Return all numbers that are less than n and are coprime to it
 const findCoprimesLessThan = (n) => {
@@ -604,7 +568,6 @@ const findCoprimesLessThan = (n) => {
 
 	return coprimes;
 }
-module.exports.findCoprimesLessThan = findCoprimesLessThan;
 
 //Return an array of numbers coprime to n of length len
 const findCoprimeList = (n, len) => {
@@ -620,7 +583,6 @@ const findCoprimeList = (n, len) => {
 
 	return coprimes;
 }
-module.exports.findCoprimeList = findCoprimeList;
 
 //Return the greatest common denominator
 const gcd = (a, b) => {
@@ -639,13 +601,11 @@ const gcd = (a, b) => {
 	}
 	return gcd;
 }
-module.exports.gcd = gcd;
 
 //Return the lowest common multiple
 const lcm = (a, b) => {
 	return Math.abs((a * b) / gcd(a, b));
 }
-module.exports.lcm = lcm;
 
 //Brute force prime checker
 const isPrime = (n) => {
@@ -658,7 +618,6 @@ const isPrime = (n) => {
 	}
 	return true;
 }
-module.exports.isPrime = isPrime;
 
 //More efficient use of ^ and % together by using the modulus throughout the power-ing
 const modPow = (b, e, m) => {
@@ -671,7 +630,6 @@ const modPow = (b, e, m) => {
 
 	return modPow;
 }
-module.exports.modPow = modPow;
 
 //RSA encryption
 const RSAEncrypt = (message, n, k) => {
@@ -683,7 +641,6 @@ const RSAEncrypt = (message, n, k) => {
 	}
 	return BEM;
 }
-module.exports.RSAEncrypt = RSAEncrypt;
 
 //RSA decryption
 const RSADecrypt = (ENCMess, n, j) => {
@@ -694,7 +651,6 @@ const RSADecrypt = (ENCMess, n, j) => {
 	}
 	return message;
 }
-module.exports.RSADecrypt = RSADecrypt;
 
 //Extended Euclid function (???????)
 const extendedEuclid = (a, b) => {
@@ -723,7 +679,6 @@ const extendedEuclid = (a, b) => {
 
 	return old_s;
 }
-module.exports.extendedEuclid = extendedEuclid;
 
 //No idea
 const eTot = (n) => {
@@ -737,7 +692,6 @@ const eTot = (n) => {
 
 	return numCoprimes;
 }
-module.exports.eTot = eTot;
 
 //Return the Carmicheal function of a number
 //TODO: Figure out what the fuck is happening with this and why it just doesn't work sometimes
@@ -760,7 +714,6 @@ const carmichael = (n) => {
 		}
 	}
 }
-module.exports.carmichael = carmichael;
 
 //Return the minimum and maximum according to the number of arguments provided
 const minAndMax = (argLength, a, b, minDef, maxDef) => {
@@ -791,7 +744,6 @@ const limit = function (limitee, a, b) {
 	}
 	return limitee;
 }
-module.exports.limit = limit;
 
 //Return a boolean of whether or not a given value would be truncated with the given lower and upper limits
 const isLimited = function (limitee, a, b) {
@@ -799,7 +751,6 @@ const isLimited = function (limitee, a, b) {
 
 	return (limitee <= minMax[0] || limitee >= minMax[1]);
 }
-module.exports.isLimited = isLimited;
 
 //Return a limited version of a vector given a lower and upper limit as vectors which form a rectangle that we truncate it into
 const vectorLimit = function (limitee, a, b) {
@@ -809,14 +760,12 @@ const vectorLimit = function (limitee, a, b) {
 	limitee.y = limit(limitee.y, minMax[0].y, minMax[1].y);
 	return limitee;
 }
-module.exports.vectorLimit = vectorLimit;
 
 //Return a boolean of whether or not a given vector would be truncated with the given lower and upper limits
 const isVectorLimited = function (limitee, a, b) {
 	let minMax = minAndMax(arguments.length, a, b, new Vector2(0, 0), new Vector2(1, 1));
 	return (isLimited(limitee.x, minMax[0].x, minMax[1].x) || isLimited(limitee.y, minMax[0].y, minMax[1].y));
 }
-module.exports.isVectorLimited = isVectorLimited;
 
 //Check if a point overlaps a rectangle
 const pointOverlap = (p, r) => {
@@ -827,7 +776,6 @@ const pointOverlap = (p, r) => {
 		p.y > r.pos.y
 	);
 }
-module.exports.pointOverlap = pointOverlap;
 
 //Check if two rectangles overlap
 const overlap = (a, b) => {
@@ -838,13 +786,11 @@ const overlap = (a, b) => {
 		(b.pos.y >= a.pos.y + a.size.y)
 	);
 }
-module.exports.overlap = overlap;
 
 //Check if a point falls within a range
 const overlap1D = (a, as, b, bs) => {
 	return (a + as >= b && b + bs >= a);
 }
-module.exports.overlap1D = overlap1D;
 
 //Convert a color in HSV format to RGB format
 const HSVtoRGB = (h, s, v) => {
@@ -873,7 +819,6 @@ const HSVtoRGB = (h, s, v) => {
 		b: Math.round(b * 256)
 	};
 }
-module.exports.HSVtoRGB = HSVtoRGB;
 
 //Return a random value between the maximum and minimum value
 const random = (a = 0, b = 1) => {
@@ -881,4 +826,3 @@ const random = (a = 0, b = 1) => {
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
 }
-module.exports.random = random;
