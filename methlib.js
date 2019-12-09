@@ -157,7 +157,7 @@ const Vector2 = class Vector2 {
 
 		//Add another vector to this one and return the result
 		this.add = function (addend) {
-			let newVec = new Vector2(this.x, this.y);
+			let newVec = new Vector2(this);
 			newVec.x += addend.x;
 			newVec.y += addend.y;
 			return newVec;
@@ -165,7 +165,7 @@ const Vector2 = class Vector2 {
 
 		//Subtract another vector from this one and return the result
 		this.sub = function (subtrahend) {
-			let newVec = new Vector2(this.x, this.y);
+			let newVec = new Vector2(this);
 			newVec.x -= subtrahend.x;
 			newVec.y -= subtrahend.y;
 			return newVec;
@@ -173,7 +173,7 @@ const Vector2 = class Vector2 {
 
 		//Scale this vector by a number and return the result
 		this.scale = function (scalar) {
-			let newVec = new Vector2(this.x, this.y);
+			let newVec = new Vector2(this);
 			newVec.x *= scalar;
 			newVec.y *= scalar;
 			return newVec;
@@ -793,7 +793,7 @@ const overlap1D = (a, as, b, bs) => {
 }
 
 //Convert a color in HSV format to RGB format
-const HSVtoRGB = (h, s, v) => {
+const HSVtoRGB = function(h, s, v) {
 	let r, g, b, i, f, p, q, t;
 
 	if (arguments.length === 1) {
@@ -821,7 +821,7 @@ const HSVtoRGB = (h, s, v) => {
 }
 
 //Return a random value between the maximum and minimum value
-const random = (a = 0, b = 1) => {
+const random = function(a = 0, b = 1) {
 	let minMax = minAndMax(arguments.length + 1, a, b, 0, 1);
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
