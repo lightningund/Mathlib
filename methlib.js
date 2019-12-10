@@ -1,36 +1,14 @@
+"use strict";
+
 /*
 * Original Author: Ben Love
 * Last Editor: Ben Love
-* Last Edited: 08/12/19
+* Last Edited: 10/12/19
 * Purpose: To store any and all helper functions you could need
 * See the README for styling rules
 */
 
-//Roman Numerals Characters
-const romChars = ['I', 'V', 'X', 'L', 'D', 'C', 'M', 'v', 'x', 'l', 'd', 'c', 'm'];
-
-//Their corresponding values
-const romVals = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000];
-
-//Constants
-const E = 2.7182818;
-const PI = 3.1415926;
-const PHI = 1.6180339;
-
-let maxVal = romVals[romVals.length - 1] * 3;
-for (let i = 0; i < romVals.length / 2; i++) {
-	maxVal += romVals[i * 2 + 1];
-}
-
-const MRV = maxVal;
-
-let cardBack = new Image();
-cardBack.src = "https://javakid0826.github.io/Methlib-js/Images/Back.png";
-let cardHighlight = new Image();
-cardHighlight.src = "https://javakid0826.github.io/Methlib-js/Images/Highlight.png";
-let cardOutline = new Image();
-cardOutline.src = "https://javakid0826.github.io/Methlib-js/Images/Outline.png";
-
+//region CLASSES
 //Color
 const Color = class Color {
 	constructor(r, g, b, a){
@@ -105,20 +83,6 @@ const Color = class Color {
 		}
 	}
 }
-
-const BLACK = new Color(0, 0, 0, 255);
-const GREY = new Color(128, 128, 128, 255);
-const WHITE = new Color(255, 255, 255, 255);
-const RED = new Color(255, 0, 0, 255);
-const GREEN = new Color(0, 255, 0, 255);
-const BLUE = new Color(0, 0, 255, 255);
-const YELLOW = new Color(255, 255, 0, 255);
-const PURPLE = new Color(255, 0, 255, 255);
-const CYAN = new Color(0, 255, 255, 255);
-const ORANGE = new Color(255, 128, 0, 255);
-
-const SUITS = ['C', 'S', 'H', 'D'];
-const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
 //Tetris Piece
 const Piece = class Piece {
@@ -291,6 +255,11 @@ const Button = class Button {
 		this.wasClicked = function (clickPos) {
 			return pointOverlap(clickPos, this)
 		}
+
+		this.display = function (context, color = "#000000") {
+			context.fillStyle = color;
+			context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
+		}
 	}
 }
 
@@ -369,6 +338,47 @@ const Deck = class Deck {
 		}
 	}
 }
+//endregion CLASSES
+
+//region CONSTANTS
+//Roman Numerals Characters
+const romChars = ['I', 'V', 'X', 'L', 'D', 'C', 'M', 'v', 'x', 'l', 'd', 'c', 'm'];
+
+//Their corresponding values
+const romVals = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000];
+
+//Constants
+const E = 2.7182818;
+const PI = 3.1415926;
+const PHI = 1.6180339;
+
+let maxVal = romVals[romVals.length - 1] * 3;
+for (let i = 0; i < romVals.length / 2; i++) {
+	maxVal += romVals[i * 2 + 1];
+}
+
+const MRV = maxVal;
+
+let cardBack = new Image();
+cardBack.src = "https://javakid0826.github.io/Methlib-js/Images/Back.png";
+let cardHighlight = new Image();
+cardHighlight.src = "https://javakid0826.github.io/Methlib-js/Images/Highlight.png";
+let cardOutline = new Image();
+cardOutline.src = "https://javakid0826.github.io/Methlib-js/Images/Outline.png";
+
+const BLACK = new Color(0, 0, 0, 255);
+const GREY = new Color(128, 128, 128, 255);
+const WHITE = new Color(255, 255, 255, 255);
+const RED = new Color(255, 0, 0, 255);
+const GREEN = new Color(0, 255, 0, 255);
+const BLUE = new Color(0, 0, 255, 255);
+const YELLOW = new Color(255, 255, 0, 255);
+const PURPLE = new Color(255, 0, 255, 255);
+const CYAN = new Color(0, 255, 255, 255);
+const ORANGE = new Color(255, 128, 0, 255);
+
+const SUITS = ['C', 'S', 'H', 'D'];
+const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
 //Tetris Pieces
 
@@ -445,143 +455,19 @@ const pieces =
 		PURPLE
 	)
 ];
+//endregion CONSTANTS
 
-const randomize = (inArr) => {
-	let outArr = [];
-	let numLoops = inArr.length;
-	for (let i = 0; i < numLoops; i++) {
-		let index = Math.floor(random(inArr.length));
-		outArr[i] = inArr.splice(index, 1)[0];
-	}
-	return outArr;
-}
-
-//Turns a passed in time (in seconds) into a formatted string with days, hours, minutes, and seconds
-const prettyTime = (time) => {
-	let seconds = time;
-	let minutes = Math.floor(seconds / 60);
-	let hours = Math.floor(minutes / 60);
-	let days = Math.floor(hours / 24);
-	let out_string = ""
-
-	if (days == 1) {
-		out_string += str(days) + "day, ";
-	} else if (days > 0) {
-		out_string += str(days) + " days, ";
-	}
-
-	if (hours == 1) {
-		out_string += str(hours % 24) + " hour, ";
-	} else if (hours > 0) {
-		out_string += str(hours % 24) + " hours, ";
-	}
-
-	if (minutes == 1) {
-		out_string += str(minutes % 60) + " minute, ";
-	} else if (minutes > 0) {
-		out_string += str(minutes % 60) + " minutes, ";
-	}
-
-	if (seconds == 1) {
-		out_string += str(seconds % 60) + " second";
-	} else if (seconds > 0) {
-		out_string += str(seconds % 60) + " seconds";
-	}
-
-	return out_string;
-}
-
+//All of the functions
+//region FUNCTIONS
+//Functions that are just do math to things
+//region MATHFUNCS
+//Basic math functions that are used more like operators
+//region BASICMATH
+//Super basic math functions that really basically just are operators at this point
+//region OPERATIONS
 //Return the logarithm of a number with an arbitrary base
 const logb = (number, base) => {
 	return (Math.log(number) / Math.log(base));
-}
-
-//Generate an MLA Citation
-const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
-	let modQuote = null;
-
-	if (lineEnd - lineStart < 2) {
-		modQuote = quote;
-	} else {
-		let quoteWords = quote.split(" ");
-		modQuote = quoteWords[0] + " " + quoteWords[1] + " ... " + quoteWords[quoteWords.length - 2] + " " + quoteWords[quoteWords.length - 1];
-	}
-
-	return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
-}
-
-//Generate the Roman numeral equivalent of a given number
-const romanNumerals = (number) => {
-	let romanNum = "";
-	let tenthPower = Math.ceil(logb(number, 10)) + 1;
-
-	if (number > MRV) {
-		return ("Error: Number too Large");
-	} else {
-		for (let i = tenthPower; i > 0; i--) {
-			let workingString = "";
-			let operatingNum = Math.floor(number / Math.pow(10, i - 1));
-			operatingNum -= Math.floor(number / Math.pow(10, i)) * 10;
-
-			//check which of 4 general categories the digit is in: 1-3, 4, 5-8, 9 (there is probably a much better way to do this)
-			if (operatingNum < 4) {
-				for (let j = 0; j < operatingNum; j++) {
-					workingString += romChars[(i - 1) * 2];
-				}
-			} else if (operatingNum == 4) {
-				workingString = romChars[(i - 1) * 2] + romChars[(i - 1) * 2 + 1];
-			} else if (operatingNum == 5) {
-				workingString = romChars[(i - 1) * 2 + 1];
-			} else if (operatingNum == 9) {
-				workingString = romChars[(i - 1) * 2] + romChars[i * 2];
-			} else {
-				workingString = romChars[(i - 1) * 2 + 1];
-				for (let j = 0; j < operatingNum - 5; j++) {
-					workingString += romChars[(i - 1) * 2];
-				}
-			}
-			romanNum += workingString;
-		}
-		return romanNum;
-	}
-}
-
-//Roman numeral tester
-const romNumTest = () => {
-	for (let i = 1; i < 101; i++) {
-		console.log(i + " : " + romanNumerals(i) + " ");
-		if (i % 10 == 0) {
-			console.log("");
-		}
-	}
-}
-
-//Return all numbers that are less than n and are coprime to it
-const findCoprimesLessThan = (n) => {
-	let coprimes = [];
-
-	for (let i = 0; i < n; i++) {
-		if (gcd(i, n) == 1) {
-			coprimes.push(checkNum);
-		}
-	}
-
-	return coprimes;
-}
-
-//Return an array of numbers coprime to n of length len
-const findCoprimeList = (n, len) => {
-	let coprimes = [];
-	let checkNum = 1;
-
-	while (coprimes.length < len) {
-		if (gcd(checkNum, n) == 1) {
-			coprimes.push(checkNum);
-		}
-		checkNum++;
-	}
-
-	return coprimes;
 }
 
 //Return the greatest common denominator
@@ -607,18 +493,6 @@ const lcm = (a, b) => {
 	return Math.abs((a * b) / gcd(a, b));
 }
 
-//Brute force prime checker
-const isPrime = (n) => {
-	for (let i = 2; i < Math.sqrt(n); i++) {
-		if (isPrime(i)) {
-			if (gcd(i, n) != 1) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
 //More efficient use of ^ and % together by using the modulus throughout the power-ing
 const modPow = (b, e, m) => {
 	let modPow = 1;
@@ -629,55 +503,6 @@ const modPow = (b, e, m) => {
 	}
 
 	return modPow;
-}
-
-//RSA encryption
-const RSAEncrypt = (message, n, k) => {
-	let BEM = [];
-	let CA = message.split("");
-	for (let i = 0; i < CA.length; i++) {
-		let NC = parseInt(CA[i]);
-		BEM[i] = modPow(NC, k, n);
-	}
-	return BEM;
-}
-
-//RSA decryption
-const RSADecrypt = (ENCMess, n, j) => {
-	let message = "";
-	for (let i = 0; i < ENCMess.length; i++) {
-		let NC = modPow(ENCMess[i], j, n);
-		message += NC.toString();
-	}
-	return message;
-}
-
-//Extended Euclid function (???????)
-const extendedEuclid = (a, b) => {
-	let s = 0;
-	let old_s = 1;
-	let t = 1;
-	let old_t = 0;
-	let r = b;
-	let old_r = a;
-	let quot = 0;
-	let temp = 0;
-
-	while (r != 0) {
-		quot = old_r / r;
-
-		temp = r;
-		r = old_r - quot * temp;
-		old_r = temp;
-		temp = s;
-		s = old_s - quot * temp;
-		old_s = temp;
-		temp = t;
-		t = old_t - quot * temp;
-		old_t = temp;
-	}
-
-	return old_s;
 }
 
 //No idea
@@ -714,24 +539,76 @@ const carmichael = (n) => {
 		}
 	}
 }
+//endregion OPERATIONS
 
-//Return the minimum and maximum according to the number of arguments provided
-const minAndMax = (argLength, a, b, minDef, maxDef) => {
-	let min, max;
-
-	if(argLength === 1){
-		min = minDef;
-		max = maxDef;
-	} else if(argLength === 2){
-		min = minDef;
-		max = a;
-	} else {
-		min = a;
-		max = b;
+//Brute force prime checker
+const isPrime = (n) => {
+	for (let i = 2; i < Math.sqrt(n); i++) {
+		if (isPrime(i)) {
+			if (gcd(i, n) != 1) {
+				return false;
+			}
+		}
 	}
-	return [min, max];
+	return true;
 }
 
+//Extended Euclid function (???????)
+const extendedEuclid = (a, b) => {
+	let s = 0;
+	let old_s = 1;
+	let t = 1;
+	let old_t = 0;
+	let r = b;
+	let old_r = a;
+	let quot = 0;
+	let temp = 0;
+
+	while (r != 0) {
+		quot = old_r / r;
+
+		temp = r;
+		r = old_r - quot * temp;
+		old_r = temp;
+		temp = s;
+		s = old_s - quot * temp;
+		old_s = temp;
+		temp = t;
+		t = old_t - quot * temp;
+		old_t = temp;
+	}
+
+	return old_s;
+}
+
+//Return all numbers that are less than n and are coprime to it
+const findCoprimesLessThan = (n) => {
+	let coprimes = [];
+
+	for (let i = 0; i < n; i++) {
+		if (gcd(i, n) == 1) {
+			coprimes.push(checkNum);
+		}
+	}
+
+	return coprimes;
+}
+
+//Return an array of numbers coprime to n of length len
+const findCoprimeList = (n, len) => {
+	let coprimes = [];
+	let checkNum = 1;
+
+	while (coprimes.length < len) {
+		if (gcd(checkNum, n) == 1) {
+			coprimes.push(checkNum);
+		}
+		checkNum++;
+	}
+
+	return coprimes;
+}
+//endregion BASICMATH
 //Return a truncated version of a value between the lower and upper limits
 const limit = function (limitee, a, b) {
 	let minMax = minAndMax(arguments.length, a, b, 0, 1);
@@ -820,9 +697,161 @@ const HSVtoRGB = function(h, s, v) {
 	};
 }
 
+//RSA encryption
+const RSAEncrypt = (message, n, k) => {
+	let BEM = [];
+	let CA = message.split("");
+	for (let i = 0; i < CA.length; i++) {
+		let NC = parseInt(CA[i]);
+		BEM[i] = modPow(NC, k, n);
+	}
+	return BEM;
+}
+
+//RSA decryption
+const RSADecrypt = (ENCMess, n, j) => {
+	let message = "";
+	for (let i = 0; i < ENCMess.length; i++) {
+		let NC = modPow(ENCMess[i], j, n);
+		message += NC.toString();
+	}
+	return message;
+}
+//endregion MATHFUNCS
+
+//Stuff that is basically useless to anyone else but we use a lot inside the library
+//region INTERNAL
+//Return the minimum and maximum according to the number of arguments provided
+const minAndMax = (argLength, a, b, minDef, maxDef) => {
+	let min, max;
+
+	if(argLength === 1){
+		min = minDef;
+		max = maxDef;
+	} else if(argLength === 2){
+		min = minDef;
+		max = a;
+	} else {
+		min = a;
+		max = b;
+	}
+	return [min, max];
+}
+
+//Roman numeral tester
+const romNumTest = () => {
+	for (let i = 1; i < 101; i++) {
+		console.log(i + " : " + romanNumerals(i) + " ");
+		if (i % 10 == 0) {
+			console.log("");
+		}
+	}
+}
+//endregion INTERNAL
+
+//Exactly what it sounds like, just random shit
+//region MISC
+//Generate an MLA Citation
+const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
+	let modQuote = null;
+
+	if (lineEnd - lineStart < 2) {
+		modQuote = quote;
+	} else {
+		let quoteWords = quote.split(" ");
+		modQuote = quoteWords[0] + " " + quoteWords[1] + " ... " + quoteWords[quoteWords.length - 2] + " " + quoteWords[quoteWords.length - 1];
+	}
+
+	return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
+}
+
+//Turns a passed in time (in seconds) into a formatted string with days, hours, minutes, and seconds
+const prettyTime = (time) => {
+	let seconds = time;
+	let minutes = Math.floor(seconds / 60);
+	let hours = Math.floor(minutes / 60);
+	let days = Math.floor(hours / 24);
+	let out_string = ""
+
+	if (days == 1) {
+		out_string += str(days) + "day, ";
+	} else if (days > 0) {
+		out_string += str(days) + " days, ";
+	}
+
+	if (hours == 1) {
+		out_string += str(hours % 24) + " hour, ";
+	} else if (hours > 0) {
+		out_string += str(hours % 24) + " hours, ";
+	}
+
+	if (minutes == 1) {
+		out_string += str(minutes % 60) + " minute, ";
+	} else if (minutes > 0) {
+		out_string += str(minutes % 60) + " minutes, ";
+	}
+
+	if (seconds == 1) {
+		out_string += str(seconds % 60) + " second";
+	} else if (seconds > 0) {
+		out_string += str(seconds % 60) + " seconds";
+	}
+
+	return out_string;
+}
+
+//Generate the Roman numeral equivalent of a given number
+const romanNumerals = (number) => {
+	let romanNum = "";
+	let tenthPower = Math.ceil(logb(number, 10)) + 1;
+
+	if (number > MRV) {
+		return ("Error: Number too Large");
+	} else {
+		for (let i = tenthPower; i > 0; i--) {
+			let workingString = "";
+			let operatingNum = Math.floor(number / Math.pow(10, i - 1));
+			operatingNum -= Math.floor(number / Math.pow(10, i)) * 10;
+
+			//check which of 4 general categories the digit is in: 1-3, 4, 5-8, 9 (there is probably a much better way to do this)
+			if (operatingNum < 4) {
+				for (let j = 0; j < operatingNum; j++) {
+					workingString += romChars[(i - 1) * 2];
+				}
+			} else if (operatingNum == 4) {
+				workingString = romChars[(i - 1) * 2] + romChars[(i - 1) * 2 + 1];
+			} else if (operatingNum == 5) {
+				workingString = romChars[(i - 1) * 2 + 1];
+			} else if (operatingNum == 9) {
+				workingString = romChars[(i - 1) * 2] + romChars[i * 2];
+			} else {
+				workingString = romChars[(i - 1) * 2 + 1];
+				for (let j = 0; j < operatingNum - 5; j++) {
+					workingString += romChars[(i - 1) * 2];
+				}
+			}
+			romanNum += workingString;
+		}
+		return romanNum;
+	}
+}
+
+//Randomize and array and return it
+const randomize = (inArr) => {
+	let outArr = [];
+	let numLoops = inArr.length;
+	for (let i = 0; i < numLoops; i++) {
+		let index = Math.floor(random(inArr.length));
+		outArr[i] = inArr.splice(index, 1)[0];
+	}
+	return outArr;
+}
+
 //Return a random value between the maximum and minimum value
 const random = function(a = 0, b = 1) {
 	let minMax = minAndMax(arguments.length + 1, a, b, 0, 1);
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
 }
+//endregion MISC
+//endregion FUNCTIONS
