@@ -3,96 +3,72 @@
 /*
 * Original Author: Ben Love
 * Last Editor: Ben Love
-* Last Edited: 10/12/19
+* Last Edited: 12/12/19
 * Purpose: To store any and all helper functions you could need
 * See the README for styling rules
 */
 
 //region CLASSES
 //Color
-const Color = class Color {
-	constructor(r, g, b, a){
+class Color {
+	constructor(r, g, b, a) {
 		this.r, this.g, this.b, this.a;
-		if(arguments.length == 0){
+		if(arguments.length == 0) {
 			this.r = 0;
 			this.g = 0;
 			this.b = 0;
 			this.a = 255;
-		} else if(arguments.length == 1){
+		} else if(arguments.length == 1) {
 			this.r = r;
 			this.g = r;
 			this.b = r;
 			this.a = 255;
-		} else if(arguments.length == 2){
+		} else if(arguments.length == 2) {
 			this.r = r;
 			this.g = r;
 			this.b = r;
 			this.a = g;
-		} else if(arguments.length == 3){
+		} else if(arguments.length == 3) {
 			this.r = r;
 			this.g = g;
 			this.b = b;
 			this.a = 255;
-		} else if(arguments.length == 4){
+		} else if(arguments.length == 4) {
 			this.r = r;
 			this.g = g;
 			this.b = b;
 			this.a = a;
 		}
 
-		this.getRGBFunc = function(){
-			return "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
-		}
-		this.getRGBHex = function(){
-			let hexR = this.r.toString(16);
-			if(hexR.length == 1){
-				hexR.unshift(" ");
-			}
-			let hexG = this.g.toString(16);
-			if(hexG.length == 1){
-				hexG.unshift(" ");
-			}
-			let hexB = this.b.toString(16);
-			if(hexB.length == 1){
-				hexB.unshift(" ");
-			}
+		this.getRGBFunc = () => "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+		this.getRGBAFunc = () => "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
+
+		this.getRGBHex = () => {
+			let r = this.r > 255 ? 255 : (this.r < 0 ? 0 : this.r);
+			let g = this.g > 255 ? 255 : (this.g < 0 ? 0 : this.g);
+			let b = this.b > 255 ? 255 : (this.b < 0 ? 0 : this.b);
+			let hexR = r < 16 ? "0" + r.toString(16) : r.toString(16);
+			let hexG = g < 16 ? "0" + g.toString(16) : g.toString(16);
+			let hexB = b < 16 ? "0" + b.toString(16) : b.toString(16);
 			return "#" + hexR + hexG + hexB;
 		}
-
-		this.getRGBAFunc = function(){
-			return "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
-		}
-		this.getRGBAHex = function(){
-			let hexR = this.r.toString(16);
-			if(hexR.length == 1){
-				hexR = "0" + hexR
-			}
-			let hexG = this.g.toString(16);
-			if(hexG.length == 1){
-				hexG = "0" + hexG
-			}
-			let hexB = this.b.toString(16);
-			if(hexB.length == 1){
-				hexB = "0" + hexB
-			}
-			let hexA = this.a.toString(16);
-			if(hexA.length == 1){
-				hexA = "0" + hexA
-			}
-			return "#" + hexR + hexG + hexB + hexA;
+		this.getRGBAHex = () => {
+			let a = this.a > 255 ? 255 : (this.a < 0 ? 0 : this.a);
+			let hexA = a < 16 ? "0" + a.toString(16) : a.toString(16);
+			return this.getRGBHex() + hexA;
 		}
 	}
 }
 
 //Tetris Piece
-const Piece = class Piece {
+class Piece {
 	constructor(parts) {
 		this.p = parts;
 	}
 }
 
 //Tetris Piece with all 4 rotations
-const PieceF = class PieceF {
+class PieceF {
 	constructor(pieceRots, color) {
 		this.rot = pieceRots;
 		this.col = color;
@@ -100,7 +76,7 @@ const PieceF = class PieceF {
 }
 
 //Honestly this was just for Tetris I don't know what purpose this serves otherwise
-const Cell = class Cell {
+class Cell {
 	constructor(isOn = false, color = new Color(), prevColor = new Color()) {
 		this.on = isOn;
 		this.col = color;
@@ -109,9 +85,9 @@ const Cell = class Cell {
 }
 
 //Helper class for 2D vectors
-const Vector2 = class Vector2 {
+class Vector2 {
 	constructor(x = 0, y = 0) {
-		if(typeof x == "Vector2"){
+		if(typeof x.x != "undefined") {
 			this.x = x.x;
 			this.y = x.y;
 		} else {
@@ -120,41 +96,22 @@ const Vector2 = class Vector2 {
 		}
 
 		//Add another vector to this one and return the result
-		this.add = function (addend) {
-			let newVec = new Vector2(this);
-			newVec.x += addend.x;
-			newVec.y += addend.y;
-			return newVec;
-		}
+		this.add = addend => new Vector2(this.x + addend.x, this.y + addend.y);
 
 		//Subtract another vector from this one and return the result
-		this.sub = function (subtrahend) {
-			let newVec = new Vector2(this);
-			newVec.x -= subtrahend.x;
-			newVec.y -= subtrahend.y;
-			return newVec;
-		}
+		this.sub = subtrahend => new Vector2(this.x - subtrahend.x, this.y - subtrahend.y);
 
 		//Scale this vector by a number and return the result
-		this.scale = function (scalar) {
-			let newVec = new Vector2(this);
-			newVec.x *= scalar;
-			newVec.y *= scalar;
-			return newVec;
-		}
+		this.scale = scalar => new Vector2(this.x * scalar, this.y * scalar);
 
 		//Return the length of this vector according to c = sqrt(a^2 + b^2)
-		this.length = function () {
-			return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
-		}
+		this.length = () => Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
 
 		//Normalize this vector (scale it so it's length is 1) and return the result
-		this.normalize = function () {
-			return this.scale(1 / this.length());
-		}
+		this.normalize = () => this.scale(1 / this.length());
 
 		//Limit this vector to a rectangle defined by the lower and upper limits forming the corners and return the result
-		this.limit = function (a, b) {
+		this.limit = (a, b) => {
 			let minMax = minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1));
 			return vectorLimit(this, minMax[0], minMax[1]);
 		}
@@ -162,7 +119,7 @@ const Vector2 = class Vector2 {
 }
 
 //Helper class for a rectangular 2D collider
-const Collider = class Collider {
+class Collider {
 	constructor(x = 0, y = 0, w = 20, h = 20, unMoving = false) {
 		this.pos = new Vector2(x, y);
 		this.size = new Vector2(w, h);
@@ -172,36 +129,34 @@ const Collider = class Collider {
 
 		this.checkCollision = (colliders, topCB, botCB, lftCB, rgtCB, anyHit) => {
 			let called = false;
-			let nextPos = new Vector2(this.pos.x + (this.vel.x / 4), this.pos.y);
-			for(let col of colliders){
-				if(overlap(new Collider(nextPos.x, nextPos.y, this.size.x, this.size.y), col)){
-					if(this.vel.x > 0){
+			let nextPosX = new Vector2(this.pos.x + (this.vel.x / 4), this.pos.y);
+			let nextPosY = new Vector2(this.pos.x, this.pos.y + (this.vel.y / 4));
+			for(let col of colliders) {
+				if(overlap(new Collider(nextPosX.x, nextPosX.y, this.size.x, this.size.y), col)) {
+					if(this.vel.x > 0) {
 						console.log("HIT L");
-						if(typeof lftCB != "undefined"){
+						if(typeof lftCB == "function") {
 							lftCB(col);
 						}
 						called = true;
 					} else {
 						console.log("HIT R");
-						if(typeof rgtCB != "undefined"){
+						if(typeof rgtCB == "function") {
 							rgtCB(col);
 						}
 						called = true;
 					}
 				}
-			}
-			nextPos = new Vector2(this.pos.x, this.pos.y + (this.vel.y / 4));
-			for(let col of colliders){
-				if(overlap(new Collider(nextPos.x, nextPos.y, this.size.x, this.size.y), col)){
-					if(this.vel.y < 0){
+				if(overlap(new Collider(nextPosY.x, nextPosY.y, this.size.x, this.size.y), col)) {
+					if(this.vel.y < 0) {
 						console.log("HIT B");
-						if(typeof botCB != "undefined"){
+						if(typeof botCB == "function") {
 							botCB(col);
 						}
 						called = true;
 					} else {
 						console.log("HIT T");
-						if(typeof topCB != "undefined"){
+						if(typeof topCB == "function") {
 							topCB(col);
 						}
 						called = true;
@@ -209,54 +164,60 @@ const Collider = class Collider {
 				}
 			}
 			if(called) {
-				if(typeof anyHit != "undefined"){
-					anyHit();
+				if(typeof anyHit == "function") {
+					anyHit(col);
 				}
 			}
 		}
 
-		this.wallLimit = function (bounds, hitGroundCallback, hitWallCallback) {
+		this.wallLimit = (bounds, hitGroundCallback, hitWallCallback) => {
 			if (isLimited(this.pos.x, bounds.x - this.size.x)) {
 				this.vel.x = 0;
-				if(hitWallCallback){
+				if(typeof hitWallCallback == "function"){
 					hitWallCallback();
 				}
 			}
 			if (isLimited(this.pos.y, bounds.y - this.size.y)) {
 				this.vel.y = 0;
-				if(hitGroundCallback){
+				if(typeof hitGroundCallback == "function"){
 					hitGroundCallback();
 				}
 			}
 			this.pos = vectorLimit(this.pos, bounds.sub(this.size));
 		}
 
-		this.subUpdate = function(updates = 1){
+		this.subUpdate = (updates = 1) => {
 			this.pos = this.pos.add(this.vel.scale(1 / updates));
 		}
 
-		this.update = function () {
-			if(!unMoving){
+		this.update = () => {
+			if(!unMoving) {
 				this.vel = this.vel.add(this.acc);
 			}
 			this.center.x = this.pos.x + (this.size.x / 2);
 			this.center.y = this.pos.y + (this.size.y / 2);
 		}
+
+		this.render = () => {
+
+		}
 	}
 }
 
 //Helper class for an arbitrary button
-const Button = class Button {
+class Button {
 	constructor(onClick, x = 0, y = 0, w = 100, h = 100) {
-		this.onClick = onClick;
+		if(typeof onClick == "function"){
+			this.onClick = onClick;
+		} else {
+			throw "onClick is not a function";
+		}
 		this.pos = new Vector2(x, y);
 		this.size = new Vector2(w, h);
 
-		this.wasClicked = function (clickPos) {
-			return pointOverlap(clickPos, this)
-		}
+		this.wasClicked = clickPos => pointOverlap(clickPos, this);
 
-		this.display = function (context, color = "#000000") {
+		this.display = (context, color = "#000000") => {
 			context.fillStyle = color;
 			context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
 		}
@@ -264,21 +225,25 @@ const Button = class Button {
 }
 
 //Helper Class for playing cards
-const Card = class Card {
+class Card {
 	constructor(suitIndex = 0, numIndex = 0) {
+		if(suitIndex >= SUITS.length){
+			throw "Suit index is out of range";
+		}
+		if(numIndex >= CARDVALS.length){
+			throw "Value index is out of range";
+		}
 		this.numI = numIndex;
 		this.suitI = suitIndex;
 		this.num = CARDVALS[numIndex];
 		this.suit = SUITS[suitIndex];
 		this.flipped = false;
-		this.sprite = new Image(20, 40);
+		this.sprite = new Image(1000, 1000);
 		this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
 
-		this.name = function () {
-			return num + suit;
-		}
+		this.name = () => num + suit;
 
-		this.flip = function() {
+		this.flip = () => {
 			this.flipped = this.flipped ? false : true;
 			return this;
 		}
@@ -286,54 +251,56 @@ const Card = class Card {
 }
 
 //Helper Class for a deck of playing cards
-const Deck = class Deck {
+class Deck {
 	constructor() {
 		this.cards = [];
 
-		for (let i = 0; i < SUITS.length; i++) {
-			for (let j = 0; j < CARDVALS.length; j++) {
+		for (let i in SUITS) {
+			for (let j in CARDVALS) {
 				this.cards.push(new Card(i, j));
 			}
 		}
 
-		this.takeTopCard = function () {
+		this.takeTopCard = () => {
 			let top = this.cards[0]
 			this.cards.splice(0, 1);
 			return top;
 		}
 
-		this.takeNthCard = function (n) {
+		this.takeNthCard = n => {
+			if(n >= this.cards.length){
+				throw "card index is out of range";
+			}
 			let nth = this.cards[n]
 			this.cards.splice(n);
 			return nth;
 		}
 
-		this.getTopCard = function () {
-			return this.cards[0];
-		}
+		this.getTopCard = () => this.cards[0];
 
-		this.getNthCard = function (n) {
+		this.getNthCard = n => {
+			if(n >= this.cards.length){
+				throw "card index is out of range";
+			}
 			return this.cards[n];
 		}
 
-		this.addCard = function (newCard) {
+		this.addCard = newCard => {
 			this.cards.push(newCard);
 		}
 
-		this.addCards = function (newCards) {
+		this.addCards = newCards => {
 			this.cards.push(...newCards);
 		}
 
-		this.shuffle = function () {
+		this.shuffle = () => {
 			this.cards = randomize(this.cards);
 			return this;
 		}
 
-		this.getCards = function () {
-			return this.cards;
-		}
+		this.getCards = () => this.cards;
 
-		this.setDeck = function (newCards) {
+		this.setDeck = newCards => {
 			this.cards = newCards;
 		}
 	}
@@ -463,16 +430,13 @@ const pieces =
 //region MATHFUNCS
 //Basic math functions that are used more like operators
 //region BASICMATH
-//Super basic math functions that really basically just are operators at this point
+//Super basic math functions that really just are operators at this point
 //region OPERATIONS
 //Return the logarithm of a number with an arbitrary base
-const logb = (number, base) => {
-	return (Math.log(number) / Math.log(base));
-}
+const logb = (number, base) => (Math.log(number) / Math.log(base));
 
 //Return the greatest common denominator
 const gcd = (a, b) => {
-	let gcd = 0;
 	let exit = false;
 
 	while (!exit) {
@@ -481,17 +445,14 @@ const gcd = (a, b) => {
 		} else if (b > a) {
 			b -= a;
 		} else {
-			gcd = a;
 			exit = true;
 		}
 	}
-	return gcd;
+	return a;
 }
 
 //Return the lowest common multiple
-const lcm = (a, b) => {
-	return Math.abs((a * b) / gcd(a, b));
-}
+const lcm = (a, b) => ((a * b) / gcd(a, b));
 
 //More efficient use of ^ and % together by using the modulus throughout the power-ing
 const modPow = (b, e, m) => {
@@ -506,7 +467,7 @@ const modPow = (b, e, m) => {
 }
 
 //No idea
-const eTot = (n) => {
+const eTot = n => {
 	let numCoprimes = 0;
 
 	for (let i = 0; i < n; i++) {
@@ -519,8 +480,8 @@ const eTot = (n) => {
 }
 
 //Return the Carmicheal function of a number
-//TODO: Figure out what the fuck is happening with this and why it just doesn't work sometimes
-const carmichael = (n) => {
+//TODO: Figure out what the hell is happening with this and why it just doesn't work sometimes
+const carmichael = n => {
 	let m = 0;
 	let coprimes = findCoprimesLessThan(n);
 	while (m < n * 10) {
@@ -542,7 +503,7 @@ const carmichael = (n) => {
 //endregion OPERATIONS
 
 //Brute force prime checker
-const isPrime = (n) => {
+const isPrime = n => {
 	for (let i = 2; i < Math.sqrt(n); i++) {
 		if (isPrime(i)) {
 			if (gcd(i, n) != 1) {
@@ -553,7 +514,7 @@ const isPrime = (n) => {
 	return true;
 }
 
-//Extended Euclid function (???????)
+//Extended Euclid (???????)
 const extendedEuclid = (a, b) => {
 	let s = 0;
 	let old_s = 1;
@@ -582,7 +543,7 @@ const extendedEuclid = (a, b) => {
 }
 
 //Return all numbers that are less than n and are coprime to it
-const findCoprimesLessThan = (n) => {
+const findCoprimesLessThan = n => {
 	let coprimes = [];
 
 	for (let i = 0; i < n; i++) {
@@ -609,6 +570,7 @@ const findCoprimeList = (n, len) => {
 	return coprimes;
 }
 //endregion BASICMATH
+
 //Return a truncated version of a value between the lower and upper limits
 const limit = function (limitee, a, b) {
 	let minMax = minAndMax(arguments.length, a, b, 0, 1);
@@ -645,32 +607,26 @@ const isVectorLimited = function (limitee, a, b) {
 }
 
 //Check if a point overlaps a rectangle
-const pointOverlap = (p, r) => {
-	return (
-		p.x > r.pos.x &&
-		p.x < r.pos.x + r.size.x &&
-		p.y < r.pos.y + r.size.y &&
-		p.y > r.pos.y
-	);
-}
+const pointOverlap = (p, r) => (
+	(p.x > r.pos.x) &&
+	(p.x < r.pos.x + r.size.x) &&
+	(p.y < r.pos.y + r.size.y) &&
+	(p.y > r.pos.y)
+);
 
 //Check if two rectangles overlap
-const overlap = (a, b) => {
-	return !(
-		(a.pos.x >= b.pos.x + b.size.x) ||
-		(b.pos.x >= a.pos.x + a.size.x) ||
-		(a.pos.y >= b.pos.y + b.size.y) ||
-		(b.pos.y >= a.pos.y + a.size.y)
-	);
-}
+const overlap = (a, b) => !(
+	(a.pos.x >= b.pos.x + b.size.x) ||
+	(b.pos.x >= a.pos.x + a.size.x) ||
+	(a.pos.y >= b.pos.y + b.size.y) ||
+	(b.pos.y >= a.pos.y + a.size.y)
+);
 
 //Check if a point falls within a range
-const overlap1D = (a, as, b, bs) => {
-	return (a + as >= b && b + bs >= a);
-}
+const overlap1D = (a, as, b, bs) => ((a + as >= b) && (b + bs >= a));
 
 //Convert a color in HSV format to RGB format
-const HSVtoRGB = function(h, s, v) {
+const HSVtoRGB = function (h, s, v) {
 	let r, g, b, i, f, p, q, t;
 
 	if (arguments.length === 1) {
@@ -682,6 +638,7 @@ const HSVtoRGB = function(h, s, v) {
 	p = v * (1 - s);
 	q = v * (1 - f * s);
 	t = v * (1 - (1 - f) * s);
+
 	switch (i % 6) {
 		case 0: r = v, g = t, b = p; break;
 		case 1: r = q, g = v, b = p; break;
@@ -701,7 +658,7 @@ const HSVtoRGB = function(h, s, v) {
 const RSAEncrypt = (message, n, k) => {
 	let BEM = [];
 	let CA = message.split("");
-	for (let i = 0; i < CA.length; i++) {
+	for (let i in CA) {
 		let NC = parseInt(CA[i]);
 		BEM[i] = modPow(NC, k, n);
 	}
@@ -711,8 +668,8 @@ const RSAEncrypt = (message, n, k) => {
 //RSA decryption
 const RSADecrypt = (ENCMess, n, j) => {
 	let message = "";
-	for (let i = 0; i < ENCMess.length; i++) {
-		let NC = modPow(ENCMess[i], j, n);
+	for (let i of ENCMess) {
+		let NC = modPow(i, j, n);
 		message += NC.toString();
 	}
 	return message;
@@ -725,10 +682,10 @@ const RSADecrypt = (ENCMess, n, j) => {
 const minAndMax = (argLength, a, b, minDef, maxDef) => {
 	let min, max;
 
-	if(argLength === 1){
+	if(argLength === 1) {
 		min = minDef;
 		max = maxDef;
-	} else if(argLength === 2){
+	} else if(argLength === 2) {
 		min = minDef;
 		max = a;
 	} else {
@@ -766,12 +723,12 @@ const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
 }
 
 //Turns a passed in time (in seconds) into a formatted string with days, hours, minutes, and seconds
-const prettyTime = (time) => {
+const prettyTime = time => {
 	let seconds = time;
 	let minutes = Math.floor(seconds / 60);
 	let hours = Math.floor(minutes / 60);
 	let days = Math.floor(hours / 24);
-	let out_string = ""
+	let out_string = "";
 
 	if (days == 1) {
 		out_string += str(days) + "day, ";
@@ -801,7 +758,7 @@ const prettyTime = (time) => {
 }
 
 //Generate the Roman numeral equivalent of a given number
-const romanNumerals = (number) => {
+const romanNumerals = number => {
 	let romanNum = "";
 	let tenthPower = Math.ceil(logb(number, 10)) + 1;
 
@@ -837,7 +794,7 @@ const romanNumerals = (number) => {
 }
 
 //Randomize and array and return it
-const randomize = (inArr) => {
+const randomize = inArr => {
 	let outArr = [];
 	let numLoops = inArr.length;
 	for (let i = 0; i < numLoops; i++) {
@@ -848,7 +805,7 @@ const randomize = (inArr) => {
 }
 
 //Return a random value between the maximum and minimum value
-const random = function(a = 0, b = 1) {
+const random = (a = 0, b = 1) => {
 	let minMax = minAndMax(arguments.length + 1, a, b, 0, 1);
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
