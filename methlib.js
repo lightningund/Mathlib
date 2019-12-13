@@ -805,7 +805,7 @@ const randomize = inArr => {
 }
 
 //Return a random value between the maximum and minimum value
-const random = (a = 0, b = 1) => {
+const random = function (a = 0, b = 1) {
 	let minMax = minAndMax(arguments.length + 1, a, b, 0, 1);
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
