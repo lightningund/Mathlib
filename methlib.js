@@ -3,11 +3,12 @@
 /*
 * Original Author: Ben Love
 * Last Editor: Ben Love
-* Last Edited: 12/12/19
+* Last Edited: 09/01/20
 * Purpose: To store any and all helper functions you could need
 * See the README for styling rules
 */
 
+//region CONSTANTS
 //region CLASSES
 //Color
 class Color {
@@ -115,8 +116,11 @@ class Vector2 {
 			let minMax = minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1));
 			return vectorLimit(this, minMax[0], minMax[1]);
 		}
+
+		this.addBoth = addend => new Vector2(this.x + addend, this.y + addend);
 	}
 }
+
 
 //Helper class for a rectangular 2D collider
 class Collider {
@@ -126,6 +130,10 @@ class Collider {
 		this.vel = new Vector2();
 		this.acc = new Vector2();
 		this.center = new Vector2();
+
+		this.show = (context) => {
+			context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
+		}
 
 		this.checkCollision = (colliders, topCB, botCB, lftCB, rgtCB, anyHit) => {
 			let called = false;
@@ -306,8 +314,7 @@ class Deck {
 	}
 }
 //endregion CLASSES
-
-//region CONSTANTS
+//region VARIABLES
 //Roman Numerals Characters
 const romChars = ['I', 'V', 'X', 'L', 'D', 'C', 'M', 'v', 'x', 'l', 'd', 'c', 'm'];
 
@@ -348,7 +355,6 @@ const SUITS = ['C', 'S', 'H', 'D'];
 const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
 //Tetris Pieces
-
 const pieces =
 [
 	//Line Piece
@@ -422,8 +428,7 @@ const pieces =
 		PURPLE
 	)
 ];
-//endregion CONSTANTS
-
+//endregion VARIABLES
 //All of the functions
 //region FUNCTIONS
 //Functions that are just do math to things
@@ -622,6 +627,8 @@ const overlap = (a, b) => !(
 	(b.pos.y >= a.pos.y + a.size.y)
 );
 
+const dist = (a, b) => Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+
 //Check if a point falls within a range
 const overlap1D = (a, as, b, bs) => ((a + as >= b) && (b + bs >= a));
 
@@ -812,3 +819,4 @@ const random = function (a = 0, b = 1) {
 }
 //endregion MISC
 //endregion FUNCTIONS
+//endregion CONSTANTS
