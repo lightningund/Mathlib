@@ -2,8 +2,6 @@
 
 /*
 * Original Author: Ben Love
-* Last Editor: Ben Love
-* Last Edited: 09/01/20
 * Purpose: To store any and all helper functions you could need
 * See the README for styling rules
 */
@@ -11,53 +9,62 @@
 //region CONSTANTS
 //region CLASSES
 //Color
+const limCol = v => typeof v == "undefined" ? 0 : (v > 255 ? 255 : (v < 0 ? 0 : v));
+const hexCol = v => (limCol(v) < 16 ? "0" : "") + v.toString(16);
+
 class Color {
+	static getRGBFunc = c => `rgb(${limCol(c.r)}, ${limCol(c.g)}, ${limCol(c.b)})`;
+	static getRGBAFunc = c => `rgba(${limCol(c.r)}, ${limCol(c.g)}, ${limCol(c.b)}, ${limCol(c.a)})`;
+
+	static getRGBHex = c => "#" + hexCol(c.r) + hexCol(c.g) + hexCol(c.b);
+	static getRGBAHex = c => Color.getRGBHex(c) + hexCol(c.a);
+
 	constructor(r, g, b, a) {
 		this.r, this.g, this.b, this.a;
-		if(arguments.length == 0) {
-			this.r = 0;
-			this.g = 0;
-			this.b = 0;
-			this.a = 255;
-		} else if(arguments.length == 1) {
-			this.r = r;
-			this.g = r;
-			this.b = r;
-			this.a = 255;
-		} else if(arguments.length == 2) {
-			this.r = r;
-			this.g = r;
-			this.b = r;
-			this.a = g;
-		} else if(arguments.length == 3) {
-			this.r = r;
-			this.g = g;
-			this.b = b;
-			this.a = 255;
-		} else if(arguments.length == 4) {
-			this.r = r;
-			this.g = g;
-			this.b = b;
-			this.a = a;
+
+		if(typeof r.r != "undefined"){
+			this.r = r.r;
+			this.g = r.g;
+			this.b = r.b;
+			if(typeof r.a != "undefined"){
+				this.a = r.a;
+			} else {
+				this.a = arguments.length == 1 ? 255 : g;
+			}
+		} else {
+			if(arguments.length == 0) {
+				this.r = 0;
+				this.g = 0;
+				this.b = 0;
+				this.a = 255;
+			} else if(arguments.length == 1) {
+				this.r = r;
+				this.g = r;
+				this.b = r;
+				this.a = 255;
+			} else if(arguments.length == 2) {
+				this.r = r;
+				this.g = r;
+				this.b = r;
+				this.a = g;
+			} else if(arguments.length == 3) {
+				this.r = r;
+				this.g = g;
+				this.b = b;
+				this.a = 255;
+			} else {
+				this.r = r;
+				this.g = g;
+				this.b = b;
+				this.a = a;
+			}
 		}
 
-		this.getRGBFunc = () => "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
-		this.getRGBAFunc = () => "rgba(" + this.r + ", " + this.g + ", " + this.b + ", " + this.a + ")";
+		this.getRGBFunc = () => `rgb(${this.r}, ${this.g}, ${this.b})`;
+		this.getRGBAFunc = () => `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
 
-		this.getRGBHex = () => {
-			let r = this.r > 255 ? 255 : (this.r < 0 ? 0 : this.r);
-			let g = this.g > 255 ? 255 : (this.g < 0 ? 0 : this.g);
-			let b = this.b > 255 ? 255 : (this.b < 0 ? 0 : this.b);
-			let hexR = r < 16 ? "0" + r.toString(16) : r.toString(16);
-			let hexG = g < 16 ? "0" + g.toString(16) : g.toString(16);
-			let hexB = b < 16 ? "0" + b.toString(16) : b.toString(16);
-			return "#" + hexR + hexG + hexB;
-		}
-		this.getRGBAHex = () => {
-			let a = this.a > 255 ? 255 : (this.a < 0 ? 0 : this.a);
-			let hexA = a < 16 ? "0" + a.toString(16) : a.toString(16);
-			return this.getRGBHex() + hexA;
-		}
+		this.getRGBHex = () => "#" + hexCol(this.r) + hexCol(this.g) + hexCol(this.b);
+		this.getRGBAHex = () => this.getRGBHex() + hexCol(this.a);
 	}
 }
 
@@ -85,8 +92,132 @@ class Cell {
 	}
 }
 
+// class Vector {
+// 	//Static Functions to use without reference to a specific instance of a vector
+
+// 	//Take a vector and create a new vector2 from it
+// 	static copy = a => new Vector(a);
+	
+// 	//Add two vectors
+// 	static add = (a, b) => new Vector(a.dimension, a.coords.map((c, i) => c+= b.coords[i]));
+
+// 	//Subtract two vectors
+// 	static sub = (a, b) => new Vector(a.dimension, a.coords.map((c, i) => c-= b.coords[i]));
+
+// 	//scale a vector by a set value
+// 	static scale = (a, scalar) => new Vector(a.dimension, a.coords.map(c => c*= scalar));
+
+// 	//Add a flat value to both values of the vector
+// 	static addAll = (a, addend) => new Vector(a.dimension, a.coords.map(c => c+= addend));
+
+// 	//Find the length of a vector
+// 	static length = a => Math.sqrt(a.coords.reduce((t, c) => t + Math.pow(c, 2), 0));
+
+// 	//Find the length of a vector but squared
+// 	//(saves on resources because Math.sqrt is pretty expensive time wise)
+// 	static squareLength = a => a.coords.reduce((t, c) => t + Math.pow(c, 2), 0);
+
+// 	//Normalize a vector (scale it so it's length is 1) and return the result
+// 	static normalize = a => Vector.scale(a, 1 / a.length());
+
+// 	static dist = (a, b) => Math.sqrt(a.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0));
+// 	static distSquared = (a, b) => a.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0);
+
+// 	constructor(dimension) {
+// 		if(dimension instanceof Vector){
+// 			this.coords = dimension.coords;
+// 			this.dimension = dimension.dimension;
+// 		} else {
+// 			this.coords = []
+// 			this.dimension = dimension;
+// 			for(let i = 0; i < this.dimension; i++){
+// 				this.coords[i] = arguments[i + 1];
+// 			}
+// 		}
+
+// 		//Make a duplicate of this vector
+// 		this.copy = () => new Vector(this);
+
+// 		//Add another vector to this one and return the result
+// 		this.add = addend => {
+// 			this.coords.map((c, i) => c+= addend.coords[i]);
+// 			return this;
+// 		}
+
+// 		//Subtract another vector from this one and return the result
+// 		this.sub = subtrahend => {
+// 			this.coords.map((c, i) => c-= subtrahend.coords[i]);
+// 			return this;
+// 		}
+
+// 		//Scale this vector by a number and return the result
+// 		this.scale = scalar => {
+// 			this.coords.map(c => c*= scalar);
+// 			return this;
+// 		}
+
+// 		//Add a flat value to both values of the vector
+// 		this.addAll = addend => {
+// 			this.coords.map(c => c+= addend);
+// 			return this;
+// 		}
+
+// 		//Return the length of this vector according to c = sqrt(a^2 + b^2)
+// 		this.length = () => Math.sqrt(this.coords.reduce((t, c) => t + Math.pow(c, 2), 0));
+
+// 		//Find the length of this vector but squared
+// 		//(saves on resources because Math.sqrt is pretty expensive time wise)
+// 		this.squareLength = () => this.coords.reduce((t, c) => t + Math.pow(c, 2), 0);
+
+// 		//Normalize this vector (scale it so it's length is 1) and return the result
+// 		this.normalize = () => this.scale(1 / this.length());
+
+// 		this.dist = a => Math.sqrt(this.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0));
+// 		this.distSquared = a => this.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0);
+// 	}
+// }
+
 //Helper class for 2D vectors
 class Vector2 {
+	//Static Functions to use without reference to a specific instance of a vector
+
+	//Take a vector and create a new vector2 from it
+	static copy = a => new Vector2(a);
+	
+	//Add two vectors
+	static add = (a, b) => new Vector2(a.x + b.x, a.y + b.y);
+
+	//Subtract two vectors
+	static sub = (a, b) => new Vector2(a.x - b.x, a.y - b.y);
+
+	//scale a vector by a set value
+	static scale = (a, scalar) => new Vector2(a.x * scalar, a.y * scalar);
+
+	//Add a flat value to both values of the vector
+	static addBoth = (a, addend) => new Vector2(a.x + addend, a.y + addend);
+
+	//Find the angle of a vector
+	static heading = a => Math.atan2(a.x, a.y);
+
+	//Find the length of a vector
+	static length = a => Math.sqrt(Math.pow(a.x, 2) + Math.pow(a.y, 2));
+
+	//Find the length of a vector but squared
+	//(saves on resources because Math.sqrt is pretty expensive time wise)
+	static squareLength = a => Math.pow(a.x, 2) + Math.pow(a.y, 2);
+
+	//Normalize a vector (scale it so it's length is 1) and return the result
+	static normalize = a => Vector2.scale(a, 1 / a.length());
+
+	//Limit a vector to a rectangle defined by the lower and upper limits forming the corners and return the result
+	static limit = function(a, min, max) {
+		let minMax = minAndMax(arguments.length + 1, min, max, new Vector2(0, 0), new Vector2(1, 1));
+		return vectorLimit(a, minMax[0], minMax[1]);
+	}
+
+	static dist = (a, b) => Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+	static distSquared = (a, b) => Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2);
+
 	constructor(x = 0, y = 0) {
 		if(typeof x.x != "undefined") {
 			this.x = x.x;
@@ -96,170 +227,224 @@ class Vector2 {
 			this.y = y;
 		}
 
+		//Make a duplicate of this vector
+		this.copy = () => new Vector2(this);
+
 		//Add another vector to this one and return the result
-		this.add = addend => new Vector2(this.x + addend.x, this.y + addend.y);
+		this.add = addend => {
+			this.x += addend.x;
+			this.y += addend.y;
+			return this;
+		}
 
 		//Subtract another vector from this one and return the result
-		this.sub = subtrahend => new Vector2(this.x - subtrahend.x, this.y - subtrahend.y);
+		this.sub = subtrahend => {
+			this.x -= subtrahend.x;
+			this.y -= subtrahend.y;
+			return this;
+		}
 
 		//Scale this vector by a number and return the result
-		this.scale = scalar => new Vector2(this.x * scalar, this.y * scalar);
+		this.scale = scalar => {
+			this.x *= scalar;
+			this.y *= scalar;
+			return this;
+		}
+
+		//Add a flat value to both values of the vector
+		this.addBoth = addend => {
+			this.x += addend;
+			this.y += addend;
+			return this;
+		}
+
+		//Find the angle of this vector
+		this.heading = () => Vector2.heading(this);
 
 		//Return the length of this vector according to c = sqrt(a^2 + b^2)
-		this.length = () => Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+		this.length = () => Vector2.length(this);
+
+		//Find the length of this vector but squared
+		//(saves on resources because Math.sqrt is pretty expensive time wise)
+		this.squareLength = () => Vector2.squareLength(this);
 
 		//Normalize this vector (scale it so it's length is 1) and return the result
 		this.normalize = () => this.scale(1 / this.length());
 
 		//Limit this vector to a rectangle defined by the lower and upper limits forming the corners and return the result
-		this.limit = (a, b) => {
-			let minMax = minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1));
-			return vectorLimit(this, minMax[0], minMax[1]);
+		this.limit = function(a, b) {
+			let n;
+			if(typeof a.x != "undefined"){
+				n = vectorLimit(this, a);
+			} else {
+				let minMax = minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1));
+				n = vectorLimit(this, minMax[0], minMax[1]);
+			}
+			this.x = n.x;
+			this.y = n.y;
+			return this;
 		}
 
-		this.addBoth = addend => new Vector2(this.x + addend, this.y + addend);
+		this.dist = a => Math.sqrt(Math.pow(this.x - a.x, 2) + Math.pow(this.y - a.y, 2));
+		this.distSquared = a => Math.pow(this.x - a.x, 2) + Math.pow(this.y - a.y, 2);
 	}
 }
 
+const cbCheck = function (cb, cond = true) {
+	if(cond) {
+		if(typeof cb == "function") {
+			cb(arguments.split(2));
+		}
+	}
+}
 
-//Helper class for a rectangular 2D collider
-class Collider {
-	constructor(x = 0, y = 0, w = 20, h = 20, unMoving = false) {
-		this.pos = new Vector2(x, y);
-		this.size = new Vector2(w, h);
-		this.vel = new Vector2();
-		this.acc = new Vector2();
-		this.center = new Vector2();
+// General 2d rectangle (this was supposed to be collider but that spiraled out of control so now we have this)
+class Box {
+	static getCenter = box => Vector2.add(box.pos, Vector2.scale(box.size, 1 / 2));
 
-		this.show = (context) => {
+	constructor(a = 0, b = 0, c = 0, d = 0) {
+		posAndSize(this, a, b, c, d);
+
+		this.render = (context, color) => {
+			if(typeof color != "undefined"){
+				context.fillStyle = color instanceof Color ? color.getRGBAFunc() : color;
+			}
 			context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
 		}
 
-		this.checkCollision = (colliders, topCB, botCB, lftCB, rgtCB, anyHit) => {
-			let called = false;
-			let nextPosX = new Vector2(this.pos.x + (this.vel.x / 4), this.pos.y);
-			let nextPosY = new Vector2(this.pos.x, this.pos.y + (this.vel.y / 4));
+		this.getCenter = () => Vector2.add(this.pos, Vector2.scale(this.size, 1 / 2));
+	}
+}
+
+//Helper class for a rectangular 2D collider
+class Collider extends Box {
+	constructor(a = 0, b = 0, c = 0, d = 0) {
+		super(a, b, c, d);
+
+		this.vel = new Vector2();
+		this.acc = new Vector2();
+
+		this.checkCollision = (colliders, uCB, dCB, lCB, rCB, aCB) => {
+			let nextPosX = Vector2.add(this.pos, {x:this.vel.x, y:0});
+			let nextPosY = Vector2.add(this.pos, {x:0, y:this.vel.y});
+
+			let nextColX = new Collider(nextPosX, this.size);
+			let nextColY = new Collider(nextPosY, this.size);
+
+			let uHit = false, dHit = false, lHit = false, rHit = false;
+
 			for(let col of colliders) {
-				if(overlap(new Collider(nextPosX.x, nextPosX.y, this.size.x, this.size.y), col)) {
-					if(this.vel.x > 0) {
-						console.log("HIT L");
-						if(typeof lftCB == "function") {
-							lftCB(col);
-						}
-						called = true;
-					} else {
-						console.log("HIT R");
-						if(typeof rgtCB == "function") {
-							rgtCB(col);
-						}
-						called = true;
-					}
+				if(col == this) continue;
+				if(overlap(col, nextColY)) {
+					if(this.vel.y > 0) uHit = true;
+					else dHit = true;
 				}
-				if(overlap(new Collider(nextPosY.x, nextPosY.y, this.size.x, this.size.y), col)) {
-					if(this.vel.y < 0) {
-						console.log("HIT B");
-						if(typeof botCB == "function") {
-							botCB(col);
-						}
-						called = true;
-					} else {
-						console.log("HIT T");
-						if(typeof topCB == "function") {
-							topCB(col);
-						}
-						called = true;
-					}
+				if(overlap(col, nextColX)) {
+					if(this.vel.x > 0) lHit = true;
+					else rHit = true;
 				}
 			}
-			if(called) {
-				if(typeof anyHit == "function") {
-					anyHit(col);
-				}
-			}
+			cbCheck(uCB, uHit, col);
+			cbCheck(dCB, dHit, col);
+			cbCheck(lCB, lHit, col);
+			cbCheck(rCB, rHit, col);
+			cbCheck(aCB, uHit || dHit || lHit || rHit, col);
 		}
 
-		this.wallLimit = (bounds, hitGroundCallback, hitWallCallback) => {
+		this.wallLimit = (bounds, gCB, wCB) => {
+			let wH = false, gH = false;
 			if (isLimited(this.pos.x, bounds.x - this.size.x)) {
 				this.vel.x = 0;
-				if(typeof hitWallCallback == "function"){
-					hitWallCallback();
-				}
+				wH = true;
 			}
 			if (isLimited(this.pos.y, bounds.y - this.size.y)) {
 				this.vel.y = 0;
-				if(typeof hitGroundCallback == "function"){
-					hitGroundCallback();
-				}
+				gH = true;
 			}
-			this.pos = vectorLimit(this.pos, bounds.sub(this.size));
+			cbCheck(wCB, wH);
+			cbCheck(gCB, gH);
+			this.pos.limit(Vector2.sub(bounds, this.size));
 		}
 
-		this.subUpdate = (updates = 1) => {
-			this.pos = this.pos.add(this.vel.scale(1 / updates));
-		}
+		this.subUpdate = (updates = 1) => {this.pos.add(Vector2.scale(this.vel, 1 / updates));}
 
-		this.update = () => {
-			if(!unMoving) {
-				this.vel = this.vel.add(this.acc);
-			}
-			this.center.x = this.pos.x + (this.size.x / 2);
-			this.center.y = this.pos.y + (this.size.y / 2);
-		}
-
-		this.render = () => {
-
-		}
+		this.update = () => {this.vel.add(this.acc);}
 	}
 }
 
 //Helper class for an arbitrary button
-class Button {
-	constructor(onClick, x = 0, y = 0, w = 100, h = 100) {
-		if(typeof onClick == "function"){
-			this.onClick = onClick;
-		} else {
-			throw "onClick is not a function";
-		}
-		this.pos = new Vector2(x, y);
-		this.size = new Vector2(w, h);
+class Button extends Box{
+	constructor(onClick = () => {}, a = 0, b = 0, c = 0, d = 0) {
+		super(a, b, c, d);
+
+		if(typeof onClick != "function") throw "onClick is not a function";
+
+		this.onClick = onClick;
 
 		this.wasClicked = clickPos => pointOverlap(clickPos, this);
-
-		this.display = (context, color = "#000000") => {
-			context.fillStyle = color;
-			context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
-		}
 	}
 }
 
 //Helper Class for playing cards
 class Card {
-	constructor(suitIndex = 0, numIndex = 0) {
-		if(suitIndex >= SUITS.length){
-			throw "Suit index is out of range";
+	static getVal = card => {
+		let val;
+		switch(card.num){
+			case "A":
+				val = 1;
+				break;
+			case "J":
+			case "Q":
+			case "K":
+				val = 10;
+				break;
+			default:
+				val = parseInt(card.num);
+				break;
 		}
-		if(numIndex >= CARDVALS.length){
-			throw "Value index is out of range";
-		}
-		this.numI = numIndex;
-		this.suitI = suitIndex;
-		this.num = CARDVALS[numIndex];
-		this.suit = SUITS[suitIndex];
-		this.flipped = false;
-		this.sprite = new Image(1000, 1000);
-		this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
+		return val;
+	}
 
-		this.name = () => num + suit;
+	static flip = card => {
+		let temp = new Card(card);
+		temp.flipped = !temp.flipped;
+		return temp;
+	}
 
-		this.flip = () => {
-			this.flipped = this.flipped ? false : true;
-			return this;
+	constructor(a = 0, b = 0, f = false) {
+		if(a instanceof Card){
+			this.numI = a.numI;
+			this.suitI = a.suitI;
+			this.num = a.num;
+			this.suit = a.suit;
+			this.flipped = a.flipped;
+			this.sprite = a.sprite;
+		} else {
+			this.numI = b;
+			this.suitI = a;
+			this.num = CARDVALS[this.numI];
+			this.suit = SUITS[this.suitI];
+			this.flipped = f;
+			this.sprite = new Image(1000, 1000);
+			this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
 		}
+
+		this.name = () => this.num + this.suit;
+
+		this.flip = () => {this.flipped = !this.flipped;}
+
+		this.getVal = () => Card.getVal(this);
 	}
 }
 
 //Helper Class for a deck of playing cards
 class Deck {
+	static shuffle = deck => {
+		let temp = new Deck();
+		temp.cards = randomize(deck.cards);
+		return temp;
+	}
+
 	constructor() {
 		this.cards = [];
 
@@ -269,48 +454,14 @@ class Deck {
 			}
 		}
 
-		this.takeTopCard = () => {
-			let top = this.cards[0]
-			this.cards.splice(0, 1);
-			return top;
-		}
+		this.takeTopCard = () => this.cards.splice(0, 1)[0];
 
-		this.takeNthCard = n => {
-			if(n >= this.cards.length){
-				throw "card index is out of range";
-			}
-			let nth = this.cards[n]
-			this.cards.splice(n);
-			return nth;
-		}
+		this.takeNthCard = n => this.cards.splice(n, 1)[0];
 
-		this.getTopCard = () => this.cards[0];
+		this.addCard = newCard => {this.cards.push(newCard);}
+		this.addCards = newCards => {this.cards.push(...newCards);}
 
-		this.getNthCard = n => {
-			if(n >= this.cards.length){
-				throw "card index is out of range";
-			}
-			return this.cards[n];
-		}
-
-		this.addCard = newCard => {
-			this.cards.push(newCard);
-		}
-
-		this.addCards = newCards => {
-			this.cards.push(...newCards);
-		}
-
-		this.shuffle = () => {
-			this.cards = randomize(this.cards);
-			return this;
-		}
-
-		this.getCards = () => this.cards;
-
-		this.setDeck = newCards => {
-			this.cards = newCards;
-		}
+		this.shuffle = () => {this.cards = randomize(this.cards);}
 	}
 }
 //endregion CLASSES
@@ -438,7 +589,7 @@ const pieces =
 //Super basic math functions that really just are operators at this point
 //region OPERATIONS
 //Return the logarithm of a number with an arbitrary base
-const logb = (number, base) => (Math.log(number) / Math.log(base));
+const logb = (number, base) => Math.log(number) / Math.log(base);
 
 //Return the greatest common denominator
 const gcd = (a, b) => {
@@ -457,7 +608,7 @@ const gcd = (a, b) => {
 }
 
 //Return the lowest common multiple
-const lcm = (a, b) => ((a * b) / gcd(a, b));
+const lcm = (a, b) => (a * b) / gcd(a, b);
 
 //More efficient use of ^ and % together by using the modulus throughout the power-ing
 const modPow = (b, e, m) => {
@@ -627,10 +778,8 @@ const overlap = (a, b) => !(
 	(b.pos.y >= a.pos.y + a.size.y)
 );
 
-const dist = (a, b) => Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-
-//Check if a point falls within a range
-const overlap1D = (a, as, b, bs) => ((a + as >= b) && (b + bs >= a));
+//Check if two ranges overlap
+const overlap1D = (a, as, b, bs) => (a + as >= b) && (b + bs >= a);
 
 //Convert a color in HSV format to RGB format
 const HSVtoRGB = function (h, s, v) {
@@ -702,6 +851,24 @@ const minAndMax = (argLength, a, b, minDef, maxDef) => {
 	return [min, max];
 }
 
+const posAndSize = (obj, a, b, c, d) => {
+	if(typeof a.x != "undefined"){
+		obj.pos = Vector2.copy(a);
+		if(typeof b.x != "undefined"){
+			obj.size = Vector2.copy(b);
+		} else {
+			obj.size = new Vector2(b, c);
+		}
+	} else {
+		obj.pos = new Vector2(a, b);
+		if(typeof c.x != "undefined"){
+			obj.size = Vector2.copy(c);
+		} else {
+			obj.size = new Vector2(c, d);
+		}
+	}
+}
+
 //Roman numeral tester
 const romNumTest = () => {
 	for (let i = 1; i < 101; i++) {
@@ -711,6 +878,8 @@ const romNumTest = () => {
 		}
 	}
 }
+
+const timeForm = (val, string) => str(val) + string + (val > 1 ? "s" : "");
 //endregion INTERNAL
 
 //Exactly what it sounds like, just random shit
@@ -735,33 +904,27 @@ const prettyTime = time => {
 	let minutes = Math.floor(seconds / 60);
 	let hours = Math.floor(minutes / 60);
 	let days = Math.floor(hours / 24);
-	let out_string = "";
 
-	if (days == 1) {
-		out_string += str(days) + "day, ";
-	} else if (days > 0) {
-		out_string += str(days) + " days, ";
+	seconds%= 60;
+	minutes%= 60;
+	hours%= 24;
+
+	let out_string = [];
+
+	if(days > 0){
+		out_string.push(timeForm(days, " day"));
+	}
+	if(hours > 0){
+		out_string.push(timeForm(hours, " hour"));
+	}
+	if(minutes > 0){
+		out_string.push(timeForm(minutes, " minute"));
+	}
+	if(seconds > 0){
+		out_string.push(timeForm(seconds, " second"));
 	}
 
-	if (hours == 1) {
-		out_string += str(hours % 24) + " hour, ";
-	} else if (hours > 0) {
-		out_string += str(hours % 24) + " hours, ";
-	}
-
-	if (minutes == 1) {
-		out_string += str(minutes % 60) + " minute, ";
-	} else if (minutes > 0) {
-		out_string += str(minutes % 60) + " minutes, ";
-	}
-
-	if (seconds == 1) {
-		out_string += str(seconds % 60) + " second";
-	} else if (seconds > 0) {
-		out_string += str(seconds % 60) + " seconds";
-	}
-
-	return out_string;
+	return out_string.join(", ");
 }
 
 //Generate the Roman numeral equivalent of a given number
@@ -769,38 +932,35 @@ const romanNumerals = number => {
 	let romanNum = "";
 	let tenthPower = Math.ceil(logb(number, 10)) + 1;
 
-	if (number > MRV) {
-		return ("Error: Number too Large");
-	} else {
-		for (let i = tenthPower; i > 0; i--) {
-			let workingString = "";
-			let operatingNum = Math.floor(number / Math.pow(10, i - 1));
-			operatingNum -= Math.floor(number / Math.pow(10, i)) * 10;
+	if (number > MRV) throw "Number too large";
+	for (let i = tenthPower; i > 0; i--) {
+		let workingString = "";
+		let operatingNum = Math.floor(number / Math.pow(10, i - 1));
+		operatingNum -= Math.floor(number / Math.pow(10, i)) * 10;
 
-			//check which of 4 general categories the digit is in: 1-3, 4, 5-8, 9 (there is probably a much better way to do this)
-			if (operatingNum < 4) {
-				for (let j = 0; j < operatingNum; j++) {
-					workingString += romChars[(i - 1) * 2];
-				}
-			} else if (operatingNum == 4) {
-				workingString = romChars[(i - 1) * 2] + romChars[(i - 1) * 2 + 1];
-			} else if (operatingNum == 5) {
-				workingString = romChars[(i - 1) * 2 + 1];
-			} else if (operatingNum == 9) {
-				workingString = romChars[(i - 1) * 2] + romChars[i * 2];
-			} else {
-				workingString = romChars[(i - 1) * 2 + 1];
-				for (let j = 0; j < operatingNum - 5; j++) {
-					workingString += romChars[(i - 1) * 2];
-				}
+		//check which of 4 general categories the digit is in: 1-3, 4, 5-8, 9 (there is probably a much better way to do this)
+		if (operatingNum < 4) {
+			for (let j = 0; j < operatingNum; j++) {
+				workingString += romChars[(i - 1) * 2];
 			}
-			romanNum += workingString;
+		} else if (operatingNum == 4) {
+			workingString = romChars[(i - 1) * 2] + romChars[(i - 1) * 2 + 1];
+		} else if (operatingNum == 5) {
+			workingString = romChars[(i - 1) * 2 + 1];
+		} else if (operatingNum == 9) {
+			workingString = romChars[(i - 1) * 2] + romChars[i * 2];
+		} else {
+			workingString = romChars[(i - 1) * 2 + 1];
+			for (let j = 0; j < operatingNum - 5; j++) {
+				workingString += romChars[(i - 1) * 2];
+			}
 		}
-		return romanNum;
+		romanNum += workingString;
 	}
+	return romanNum;
 }
 
-//Randomize and array and return it
+//Randomize an array and return it
 const randomize = inArr => {
 	let outArr = [];
 	let numLoops = inArr.length;
@@ -816,6 +976,20 @@ const random = function (a = 0, b = 1) {
 	let minMax = minAndMax(arguments.length + 1, a, b, 0, 1);
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
+}
+
+//Generate and return a random color
+const randomColor = () => {
+	let r = Math.floor(random(255));
+	let g = Math.floor(random(255));
+	let b = Math.floor(random(255));
+
+	return new Color(r, g, b);
+}
+
+const removeFromArray = (arr, val) => {
+	let i = arr.indexOf(val);
+	if(i != -1) arr.splice(i, 1);
 }
 //endregion MISC
 //endregion FUNCTIONS
