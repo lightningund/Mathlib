@@ -972,7 +972,7 @@ const randomize = inArr => {
 	for (let i = 0; i < numLoops; i++) {
 		let index;
 		while(index == undefined){
-			index = Math.floor(random(indices.length)); 
+			index = indicies[Math.floor(random(indices.length))]; 
 		}
 		outArr[i] = inArr[index];
 		delete indices[index];
