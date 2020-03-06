@@ -964,9 +964,18 @@ const romanNumerals = number => {
 const randomize = inArr => {
 	let outArr = [];
 	let numLoops = inArr.length;
+	let indices = [];
+	for(let i in inArr){
+		indices[i] = i;
+	}
+
 	for (let i = 0; i < numLoops; i++) {
-		let index = Math.floor(random(inArr.length));
-		outArr[i] = inArr.splice(index, 1)[0];
+		let index;
+		while(index == undefined){
+			index = Math.floor(random(indices.length)); 
+		}
+		outArr[i] = inArr[index];
+		delete indices[index];
 	}
 	return outArr;
 }
