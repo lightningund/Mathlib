@@ -1,1005 +1,1233 @@
-"use strict";
-
-/*
-* Original Author: Ben Love
-* Purpose: To store any and all helper functions you could need
-* See the README for styling rules
-*/
-
-//region CONSTANTS
-//region CLASSES
-//Color
-const limCol = v => typeof v == "undefined" ? 0 : (v > 255 ? 255 : (v < 0 ? 0 : v));
-const hexCol = v => (limCol(v) < 16 ? "0" : "") + v.toString(16);
-
-class Color {
-	static getRGBFunc = c => `rgb(${limCol(c.r)}, ${limCol(c.g)}, ${limCol(c.b)})`;
-	static getRGBAFunc = c => `rgba(${limCol(c.r)}, ${limCol(c.g)}, ${limCol(c.b)}, ${limCol(c.a)})`;
-
-	static getRGBHex = c => "#" + hexCol(c.r) + hexCol(c.g) + hexCol(c.b);
-	static getRGBAHex = c => Color.getRGBHex(c) + hexCol(c.a);
-
-	constructor(r, g, b, a) {
-		this.r, this.g, this.b, this.a;
-
-		if(typeof r.r != "undefined"){
-			this.r = r.r;
-			this.g = r.g;
-			this.b = r.b;
-			if(typeof r.a != "undefined"){
-				this.a = r.a;
-			} else {
-				this.a = arguments.length == 1 ? 255 : g;
-			}
-		} else {
-			if(arguments.length == 0) {
-				this.r = 0;
-				this.g = 0;
-				this.b = 0;
-				this.a = 255;
-			} else if(arguments.length == 1) {
-				this.r = r;
-				this.g = r;
-				this.b = r;
-				this.a = 255;
-			} else if(arguments.length == 2) {
-				this.r = r;
-				this.g = r;
-				this.b = r;
-				this.a = g;
-			} else if(arguments.length == 3) {
-				this.r = r;
-				this.g = g;
-				this.b = b;
-				this.a = 255;
-			} else {
-				this.r = r;
-				this.g = g;
-				this.b = b;
-				this.a = a;
-			}
-		}
-
-		this.getRGBFunc = () => `rgb(${this.r}, ${this.g}, ${this.b})`;
-		this.getRGBAFunc = () => `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
-
-		this.getRGBHex = () => "#" + hexCol(this.r) + hexCol(this.g) + hexCol(this.b);
-		this.getRGBAHex = () => this.getRGBHex() + hexCol(this.a);
-	}
-}
-
-//Tetris Piece
-class Piece {
-	constructor(parts) {
-		this.p = parts;
-	}
-}
-
-//Tetris Piece with all 4 rotations
-class PieceF {
-	constructor(pieceRots, color) {
-		this.rot = pieceRots;
-		this.col = color;
-	}
-}
-
-//Honestly this was just for Tetris I don't know what purpose this serves otherwise
-class Cell {
-	constructor(isOn = false, color = new Color(), prevColor = new Color()) {
-		this.on = isOn;
-		this.col = color;
-		this.prevCol = prevColor;
-	}
-}
-
-// class Vector {
-// 	//Static Functions to use without reference to a specific instance of a vector
-
-// 	//Take a vector and create a new vector2 from it
-// 	static copy = a => new Vector(a);
-	
-// 	//Add two vectors
-// 	static add = (a, b) => new Vector(a.dimension, a.coords.map((c, i) => c+= b.coords[i]));
-
-// 	//Subtract two vectors
-// 	static sub = (a, b) => new Vector(a.dimension, a.coords.map((c, i) => c-= b.coords[i]));
-
-// 	//scale a vector by a set value
-// 	static scale = (a, scalar) => new Vector(a.dimension, a.coords.map(c => c*= scalar));
-
-// 	//Add a flat value to both values of the vector
-// 	static addAll = (a, addend) => new Vector(a.dimension, a.coords.map(c => c+= addend));
-
-// 	//Find the length of a vector
-// 	static length = a => Math.sqrt(a.coords.reduce((t, c) => t + Math.pow(c, 2), 0));
-
-// 	//Find the length of a vector but squared
-// 	//(saves on resources because Math.sqrt is pretty expensive time wise)
-// 	static squareLength = a => a.coords.reduce((t, c) => t + Math.pow(c, 2), 0);
-
-// 	//Normalize a vector (scale it so it's length is 1) and return the result
-// 	static normalize = a => Vector.scale(a, 1 / a.length());
-
-// 	static dist = (a, b) => Math.sqrt(a.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0));
-// 	static distSquared = (a, b) => a.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0);
-
-// 	constructor(dimension) {
-// 		if(dimension instanceof Vector){
-// 			this.coords = dimension.coords;
-// 			this.dimension = dimension.dimension;
-// 		} else {
-// 			this.coords = []
-// 			this.dimension = dimension;
-// 			for(let i = 0; i < this.dimension; i++){
-// 				this.coords[i] = arguments[i + 1];
-// 			}
-// 		}
-
-// 		//Make a duplicate of this vector
-// 		this.copy = () => new Vector(this);
-
-// 		//Add another vector to this one and return the result
-// 		this.add = addend => {
-// 			this.coords.map((c, i) => c+= addend.coords[i]);
-// 			return this;
-// 		}
-
-// 		//Subtract another vector from this one and return the result
-// 		this.sub = subtrahend => {
-// 			this.coords.map((c, i) => c-= subtrahend.coords[i]);
-// 			return this;
-// 		}
-
-// 		//Scale this vector by a number and return the result
-// 		this.scale = scalar => {
-// 			this.coords.map(c => c*= scalar);
-// 			return this;
-// 		}
-
-// 		//Add a flat value to both values of the vector
-// 		this.addAll = addend => {
-// 			this.coords.map(c => c+= addend);
-// 			return this;
-// 		}
-
-// 		//Return the length of this vector according to c = sqrt(a^2 + b^2)
-// 		this.length = () => Math.sqrt(this.coords.reduce((t, c) => t + Math.pow(c, 2), 0));
-
-// 		//Find the length of this vector but squared
-// 		//(saves on resources because Math.sqrt is pretty expensive time wise)
-// 		this.squareLength = () => this.coords.reduce((t, c) => t + Math.pow(c, 2), 0);
-
-// 		//Normalize this vector (scale it so it's length is 1) and return the result
-// 		this.normalize = () => this.scale(1 / this.length());
-
-// 		this.dist = a => Math.sqrt(this.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0));
-// 		this.distSquared = a => this.coords.reduce((t, c, i) => t + Math.pow(c - a.coords[i], 2), 0);
-// 	}
-// }
-
-//Helper class for 2D vectors
-class Vector2 {
-	//Static Functions to use without reference to a specific instance of a vector
-
-	//Take a vector and create a new vector2 from it
-	static copy = a => new Vector2(a);
-	
-	//Add two vectors
-	static add = (a, b) => new Vector2(a.x + b.x, a.y + b.y);
-
-	//Subtract two vectors
-	static sub = (a, b) => new Vector2(a.x - b.x, a.y - b.y);
-
-	//scale a vector by a set value
-	static scale = (a, scalar) => new Vector2(a.x * scalar, a.y * scalar);
-
-	//Add a flat value to both values of the vector
-	static addBoth = (a, addend) => new Vector2(a.x + addend, a.y + addend);
-
-	//Find the angle of a vector
-	static heading = a => Math.atan2(a.x, a.y);
-
-	//Find the length of a vector
-	static length = a => Math.sqrt(Math.pow(a.x, 2) + Math.pow(a.y, 2));
-
-	//Find the length of a vector but squared
-	//(saves on resources because Math.sqrt is pretty expensive time wise)
-	static squareLength = a => Math.pow(a.x, 2) + Math.pow(a.y, 2);
-
-	//Normalize a vector (scale it so it's length is 1) and return the result
-	static normalize = a => Vector2.scale(a, 1 / a.length());
-
-	//Limit a vector to a rectangle defined by the lower and upper limits forming the corners and return the result
-	static limit = function(a, min, max) {
-		let minMax = minAndMax(arguments.length + 1, min, max, new Vector2(0, 0), new Vector2(1, 1));
-		return vectorLimit(a, minMax[0], minMax[1]);
-	}
-
-	static dist = (a, b) => Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-	static distSquared = (a, b) => Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2);
-
-	constructor(x = 0, y = 0) {
-		if(typeof x.x != "undefined") {
-			this.x = x.x;
-			this.y = x.y;
-		} else {
-			this.x = x;
-			this.y = y;
-		}
-
-		//Make a duplicate of this vector
-		this.copy = () => new Vector2(this);
-
-		//Add another vector to this one and return the result
-		this.add = addend => {
-			this.x += addend.x;
-			this.y += addend.y;
-			return this;
-		}
-
-		//Subtract another vector from this one and return the result
-		this.sub = subtrahend => {
-			this.x -= subtrahend.x;
-			this.y -= subtrahend.y;
-			return this;
-		}
-
-		//Scale this vector by a number and return the result
-		this.scale = scalar => {
-			this.x *= scalar;
-			this.y *= scalar;
-			return this;
-		}
-
-		//Add a flat value to both values of the vector
-		this.addBoth = addend => {
-			this.x += addend;
-			this.y += addend;
-			return this;
-		}
-
-		//Find the angle of this vector
-		this.heading = () => Vector2.heading(this);
-
-		//Return the length of this vector according to c = sqrt(a^2 + b^2)
-		this.length = () => Vector2.length(this);
-
-		//Find the length of this vector but squared
-		//(saves on resources because Math.sqrt is pretty expensive time wise)
-		this.squareLength = () => Vector2.squareLength(this);
-
-		//Normalize this vector (scale it so it's length is 1) and return the result
-		this.normalize = () => this.scale(1 / this.length());
-
-		//Limit this vector to a rectangle defined by the lower and upper limits forming the corners and return the result
-		this.limit = function(a, b) {
-			let n;
-			if(typeof a.x != "undefined"){
-				n = vectorLimit(this, a);
-			} else {
-				let minMax = minAndMax(arguments.length + 1, a, b, new Vector2(0, 0), new Vector2(1, 1));
-				n = vectorLimit(this, minMax[0], minMax[1]);
-			}
-			this.x = n.x;
-			this.y = n.y;
-			return this;
-		}
-
-		this.dist = a => Math.sqrt(Math.pow(this.x - a.x, 2) + Math.pow(this.y - a.y, 2));
-		this.distSquared = a => Math.pow(this.x - a.x, 2) + Math.pow(this.y - a.y, 2);
-	}
-}
-
-const cbCheck = function (cb, cond = true) {
-	if(cond) {
-		if(typeof cb == "function") {
-			cb(arguments.split(2));
-		}
-	}
-}
-
-// General 2d rectangle (this was supposed to be collider but that spiraled out of control so now we have this)
-class Box {
-	static getCenter = box => Vector2.add(box.pos, Vector2.scale(box.size, 1 / 2));
-
-	constructor(a = 0, b = 0, c = 0, d = 0) {
-		posAndSize(this, a, b, c, d);
-
-		this.render = (context, color) => {
-			if(typeof color != "undefined"){
-				context.fillStyle = color instanceof Color ? color.getRGBAFunc() : color;
-			}
-			context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
-		}
-
-		this.getCenter = () => Vector2.add(this.pos, Vector2.scale(this.size, 1 / 2));
-	}
-}
-
-//Helper class for a rectangular 2D collider
-class Collider extends Box {
-	constructor(a = 0, b = 0, c = 0, d = 0) {
-		super(a, b, c, d);
-
-		this.vel = new Vector2();
-		this.acc = new Vector2();
-
-		this.checkCollision = (colliders, uCB, dCB, lCB, rCB, aCB) => {
-			let nextPosX = Vector2.add(this.pos, {x:this.vel.x, y:0});
-			let nextPosY = Vector2.add(this.pos, {x:0, y:this.vel.y});
-
-			let nextColX = new Collider(nextPosX, this.size);
-			let nextColY = new Collider(nextPosY, this.size);
-
-			let uHit = false, dHit = false, lHit = false, rHit = false;
-
-			for(let col of colliders) {
-				if(col == this) continue;
-				if(overlap(col, nextColY)) {
-					if(this.vel.y > 0) uHit = true;
-					else dHit = true;
-				}
-				if(overlap(col, nextColX)) {
-					if(this.vel.x > 0) lHit = true;
-					else rHit = true;
-				}
-			}
-			cbCheck(uCB, uHit, col);
-			cbCheck(dCB, dHit, col);
-			cbCheck(lCB, lHit, col);
-			cbCheck(rCB, rHit, col);
-			cbCheck(aCB, uHit || dHit || lHit || rHit, col);
-		}
-
-		this.wallLimit = (bounds, gCB, wCB) => {
-			let wH = false, gH = false;
-			if (isLimited(this.pos.x, bounds.x - this.size.x)) {
-				this.vel.x = 0;
-				wH = true;
-			}
-			if (isLimited(this.pos.y, bounds.y - this.size.y)) {
-				this.vel.y = 0;
-				gH = true;
-			}
-			cbCheck(wCB, wH);
-			cbCheck(gCB, gH);
-			this.pos.limit(Vector2.sub(bounds, this.size));
-		}
-
-		this.subUpdate = (updates = 1) => {this.pos.add(Vector2.scale(this.vel, 1 / updates));}
-
-		this.update = () => {this.vel.add(this.acc);}
-	}
-}
-
-//Helper class for an arbitrary button
-class Button extends Box{
-	constructor(onClick = () => {}, a = 0, b = 0, c = 0, d = 0) {
-		super(a, b, c, d);
-
-		if(typeof onClick != "function") throw "onClick is not a function";
-
-		this.onClick = onClick;
-
-		this.wasClicked = clickPos => pointOverlap(clickPos, this);
-	}
-}
-
-//Helper Class for playing cards
-class Card {
-	static getVal = card => {
-		let val;
-		switch(card.num){
-			case "A":
-				val = 1;
-				break;
-			case "J":
-			case "Q":
-			case "K":
-				val = 10;
-				break;
-			default:
-				val = parseInt(card.num);
-				break;
-		}
-		return val;
-	}
-
-	static flip = card => {
-		let temp = new Card(card);
-		temp.flipped = !temp.flipped;
-		return temp;
-	}
-
-	constructor(a = 0, b = 0, f = false) {
-		if(a instanceof Card){
-			this.numI = a.numI;
-			this.suitI = a.suitI;
-			this.num = a.num;
-			this.suit = a.suit;
-			this.flipped = a.flipped;
-			this.sprite = a.sprite;
-		} else {
-			this.numI = b;
-			this.suitI = a;
-			this.num = CARDVALS[this.numI];
-			this.suit = SUITS[this.suitI];
-			this.flipped = f;
-			this.sprite = new Image(1000, 1000);
-			this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
-		}
-
-		this.name = () => this.num + this.suit;
-
-		this.flip = () => {this.flipped = !this.flipped;}
-
-		this.getVal = () => Card.getVal(this);
-	}
-}
-
-//Helper Class for a deck of playing cards
-class Deck {
-	static shuffle = deck => {
-		let temp = new Deck();
-		temp.cards = randomize(deck.cards);
-		return temp;
-	}
-
-	constructor() {
-		this.cards = [];
-
-		for (let i in SUITS) {
-			for (let j in CARDVALS) {
-				this.cards.push(new Card(i, j));
-			}
-		}
-
-		this.takeTopCard = () => this.cards.splice(0, 1)[0];
-
-		this.takeNthCard = n => this.cards.splice(n, 1)[0];
-
-		this.addCard = newCard => {this.cards.push(newCard);}
-		this.addCards = newCards => {this.cards.push(...newCards);}
-
-		this.shuffle = () => {this.cards = randomize(this.cards);}
-	}
-}
-//endregion CLASSES
-//region VARIABLES
-//Roman Numerals Characters
-const romChars = ['I', 'V', 'X', 'L', 'D', 'C', 'M', 'v', 'x', 'l', 'd', 'c', 'm'];
-
-//Their corresponding values
-const romVals = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000];
-
-//Constants
-const E = 2.7182818;
-const PI = 3.1415926;
-const PHI = 1.6180339;
-
-let maxVal = romVals[romVals.length - 1] * 3;
-for (let i = 0; i < romVals.length / 2; i++) {
-	maxVal += romVals[i * 2 + 1];
-}
-
-const MRV = maxVal;
-
-let cardBack = new Image();
-cardBack.src = "https://javakid0826.github.io/Methlib-js/Images/Back.png";
-let cardHighlight = new Image();
-cardHighlight.src = "https://javakid0826.github.io/Methlib-js/Images/Highlight.png";
-let cardOutline = new Image();
-cardOutline.src = "https://javakid0826.github.io/Methlib-js/Images/Outline.png";
-
-const BLACK = new Color(0, 0, 0, 255);
-const GREY = new Color(128, 128, 128, 255);
-const WHITE = new Color(255, 255, 255, 255);
-const RED = new Color(255, 0, 0, 255);
-const GREEN = new Color(0, 255, 0, 255);
-const BLUE = new Color(0, 0, 255, 255);
-const YELLOW = new Color(255, 255, 0, 255);
-const PURPLE = new Color(255, 0, 255, 255);
-const CYAN = new Color(0, 255, 255, 255);
-const ORANGE = new Color(255, 128, 0, 255);
-
-const SUITS = ['C', 'S', 'H', 'D'];
-const CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-
-//Tetris Pieces
-const pieces =
-[
-	//Line Piece
-	new PieceF(
-		[
-			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(3, 2)]),
-			new Piece([new Vector2(2, 0), new Vector2(2, 1), new Vector2(2, 2), new Vector2(2, 3)]),
-			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(3, 2)]),
-			new Piece([new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)])
-		],
-		CYAN
-	),
-	//L Piece 1
-	new PieceF(
-		[
-			new Piece([new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)]),
-			new Piece([new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3), new Vector2(2, 3)]),
-			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(0, 3)]),
-			new Piece([new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)])
-		],
-		ORANGE
-	),
-	//L Piece 2
-	new PieceF(
-		[
-			new Piece([new Vector2(0, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)]),
-			new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(1, 3)]),
-			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)]),
-			new Piece([new Vector2(2, 1), new Vector2(2, 2), new Vector2(1, 3), new Vector2(2, 3)])
-		],
-		BLUE
-	),
-	//Square Piece
-	new PieceF(
-		[
-			new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)]),
-			new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)]),
-			new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)]),
-			new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)])
-		],
-		YELLOW
-	),
-	//Z Piece 1
-	new PieceF(
-		[
-			new Piece([new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2)]),
-			new Piece([new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)]),
-			new Piece([new Vector2(1, 2), new Vector2(2, 2), new Vector2(0, 3), new Vector2(1, 3)]),
-			new Piece([new Vector2(0, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3)])
-		],
-		GREEN
-	),
-	//Z Piece 2
-	new PieceF(
-		[
-			new Piece([new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)]),
-			new Piece([new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)]),
-			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3), new Vector2(2, 3)]),
-			new Piece([new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(0, 3)])
-		],
-		RED
-	),
-	//T Piece
-	new PieceF(
-		[
-			new Piece([new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)]),
-			new Piece([new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)]),
-			new Piece([new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)]),
-			new Piece([new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3)])
-		],
-		PURPLE
-	)
-];
-//endregion VARIABLES
-//All of the functions
-//region FUNCTIONS
-//Functions that are just do math to things
-//region MATHFUNCS
-//Basic math functions that are used more like operators
-//region BASICMATH
-//Super basic math functions that really just are operators at this point
-//region OPERATIONS
-//Return the logarithm of a number with an arbitrary base
-const logb = (number, base) => Math.log(number) / Math.log(base);
-
-//Return the greatest common denominator
-const gcd = (a, b) => {
-	let exit = false;
-
-	while (!exit) {
-		if (a > b) {
-			a -= b;
-		} else if (b > a) {
-			b -= a;
-		} else {
-			exit = true;
-		}
-	}
-	return a;
-}
-
-//Return the lowest common multiple
-const lcm = (a, b) => (a * b) / gcd(a, b);
-
-//More efficient use of ^ and % together by using the modulus throughout the power-ing
-const modPow = (b, e, m) => {
-	let modPow = 1;
-
-	for (let i = 0; i < e; i++) {
-		modPow *= b;
-		modPow %= m;
-	}
-
-	return modPow;
-}
-
-//No idea
-const eTot = n => {
-	let numCoprimes = 0;
-
-	for (let i = 0; i < n; i++) {
-		if (gcd(i, n) == 1) {
-			numCoprimes++;
-		}
-	}
-
-	return numCoprimes;
-}
-
-//Return the Carmicheal function of a number
-//TODO: Figure out what the hell is happening with this and why it just doesn't work sometimes
-const carmichael = n => {
-	let m = 0;
-	let coprimes = findCoprimesLessThan(n);
-	while (m < n * 10) {
-		m++;
-		let success = true;
-		for (let a of coprimes) {
-			if (Math.pow(a, m) % n != 1) {
-				success = false;
-				break;
-			}
-		}
-		if (!success) {
-			continue;
-		} else {
-			return m;
-		}
-	}
-}
-//endregion OPERATIONS
-
-//Brute force prime checker
-const isPrime = n => {
-	for (let i = 2; i < Math.sqrt(n); i++) {
-		if (isPrime(i)) {
-			if (gcd(i, n) != 1) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-//Extended Euclid (???????)
-const extendedEuclid = (a, b) => {
-	let s = 0;
-	let old_s = 1;
-	let t = 1;
-	let old_t = 0;
-	let r = b;
-	let old_r = a;
-	let quot = 0;
-	let temp = 0;
-
-	while (r != 0) {
-		quot = old_r / r;
-
-		temp = r;
-		r = old_r - quot * temp;
-		old_r = temp;
-		temp = s;
-		s = old_s - quot * temp;
-		old_s = temp;
-		temp = t;
-		t = old_t - quot * temp;
-		old_t = temp;
-	}
-
-	return old_s;
-}
-
-//Return all numbers that are less than n and are coprime to it
-const findCoprimesLessThan = n => {
-	let coprimes = [];
-
-	for (let i = 0; i < n; i++) {
-		if (gcd(i, n) == 1) {
-			coprimes.push(checkNum);
-		}
-	}
-
-	return coprimes;
-}
-
-//Return an array of numbers coprime to n of length len
-const findCoprimeList = (n, len) => {
-	let coprimes = [];
-	let checkNum = 1;
-
-	while (coprimes.length < len) {
-		if (gcd(checkNum, n) == 1) {
-			coprimes.push(checkNum);
-		}
-		checkNum++;
-	}
-
-	return coprimes;
-}
-//endregion BASICMATH
-
-//Return a truncated version of a value between the lower and upper limits
-const limit = function (limitee, a, b) {
-	let minMax = minAndMax(arguments.length, a, b, 0, 1);
-
-	if (limitee <= minMax[0]) {
-		return minMax[0];
-	}
-	if (limitee >= minMax[1]) {
-		return minMax[1];
-	}
-	return limitee;
-}
-
-//Return a boolean of whether or not a given value would be truncated with the given lower and upper limits
-const isLimited = function (limitee, a, b) {
-	let minMax = minAndMax(arguments.length, a, b, 0, 1);
-
-	return (limitee <= minMax[0] || limitee >= minMax[1]);
-}
-
-//Return a limited version of a vector given a lower and upper limit as vectors which form a rectangle that we truncate it into
-const vectorLimit = function (limitee, a, b) {
-	let minMax = minAndMax(arguments.length, a, b, new Vector2(0, 0), new Vector2(1, 1));
-
-	limitee.x = limit(limitee.x, minMax[0].x, minMax[1].x);
-	limitee.y = limit(limitee.y, minMax[0].y, minMax[1].y);
-	return limitee;
-}
-
-//Return a boolean of whether or not a given vector would be truncated with the given lower and upper limits
-const isVectorLimited = function (limitee, a, b) {
-	let minMax = minAndMax(arguments.length, a, b, new Vector2(0, 0), new Vector2(1, 1));
-	return (isLimited(limitee.x, minMax[0].x, minMax[1].x) || isLimited(limitee.y, minMax[0].y, minMax[1].y));
-}
-
-//Check if a point overlaps a rectangle
-const pointOverlap = (p, r) => (
-	(p.x > r.pos.x) &&
-	(p.x < r.pos.x + r.size.x) &&
-	(p.y < r.pos.y + r.size.y) &&
-	(p.y > r.pos.y)
-);
-
-//Check if two rectangles overlap
-const overlap = (a, b) => !(
-	(a.pos.x >= b.pos.x + b.size.x) ||
-	(b.pos.x >= a.pos.x + a.size.x) ||
-	(a.pos.y >= b.pos.y + b.size.y) ||
-	(b.pos.y >= a.pos.y + a.size.y)
-);
-
-//Check if two ranges overlap
-const overlap1D = (a, as, b, bs) => (a + as >= b) && (b + bs >= a);
-
-//Convert a color in HSV format to RGB format
-const HSVtoRGB = function (h, s, v) {
-	let r, g, b, i, f, p, q, t;
-
-	if (arguments.length === 1) {
-		s = h.s, v = h.v, h = h.h;
-	}
-
-	i = Math.floor(h * 6);
-	f = h * 6 - i;
-	p = v * (1 - s);
-	q = v * (1 - f * s);
-	t = v * (1 - (1 - f) * s);
-
-	switch (i % 6) {
-		case 0: r = v, g = t, b = p; break;
-		case 1: r = q, g = v, b = p; break;
-		case 2: r = p, g = v, b = t; break;
-		case 3: r = p, g = q, b = v; break;
-		case 4: r = t, g = p, b = v; break;
-		case 5: r = v, g = p, b = q; break;
-	}
-	return {
-		r: Math.round(r * 256),
-		g: Math.round(g * 256),
-		b: Math.round(b * 256)
-	};
-}
-
-//RSA encryption
-const RSAEncrypt = (message, n, k) => {
-	let BEM = [];
-	let CA = message.split("");
-	for (let i in CA) {
-		let NC = parseInt(CA[i]);
-		BEM[i] = modPow(NC, k, n);
-	}
-	return BEM;
-}
-
-//RSA decryption
-const RSADecrypt = (ENCMess, n, j) => {
-	let message = "";
-	for (let i of ENCMess) {
-		let NC = modPow(i, j, n);
-		message += NC.toString();
-	}
-	return message;
-}
-//endregion MATHFUNCS
-
-//Stuff that is basically useless to anyone else but we use a lot inside the library
-//region INTERNAL
-//Return the minimum and maximum according to the number of arguments provided
-const minAndMax = (argLength, a, b, minDef, maxDef) => {
-	let min, max;
-
-	if(argLength === 1) {
-		min = minDef;
-		max = maxDef;
-	} else if(argLength === 2) {
-		min = minDef;
-		max = a;
-	} else {
-		min = a;
-		max = b;
-	}
-	return [min, max];
-}
-
-const posAndSize = (obj, a, b, c, d) => {
-	if(typeof a.x != "undefined"){
-		obj.pos = Vector2.copy(a);
-		if(typeof b.x != "undefined"){
-			obj.size = Vector2.copy(b);
-		} else {
-			obj.size = new Vector2(b, c);
-		}
-	} else {
-		obj.pos = new Vector2(a, b);
-		if(typeof c.x != "undefined"){
-			obj.size = Vector2.copy(c);
-		} else {
-			obj.size = new Vector2(c, d);
-		}
-	}
-}
-
-//Roman numeral tester
-const romNumTest = () => {
-	for (let i = 1; i < 101; i++) {
-		console.log(i + " : " + romanNumerals(i) + " ");
-		if (i % 10 == 0) {
-			console.log("");
-		}
-	}
-}
-
-const timeForm = (val, string) => str(val) + string + (val > 1 ? "s" : "");
-//endregion INTERNAL
-
-//Exactly what it sounds like, just random shit
-//region MISC
-//Generate an MLA Citation
-const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
-	let modQuote = null;
-
-	if (lineEnd - lineStart < 2) {
-		modQuote = quote;
-	} else {
-		let quoteWords = quote.split(" ");
-		modQuote = quoteWords[0] + " " + quoteWords[1] + " ... " + quoteWords[quoteWords.length - 2] + " " + quoteWords[quoteWords.length - 1];
-	}
-
-	return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
-}
-
-//Turns a passed in time (in seconds) into a formatted string with days, hours, minutes, and seconds
-const prettyTime = time => {
-	let seconds = time;
-	let minutes = Math.floor(seconds / 60);
-	let hours = Math.floor(minutes / 60);
-	let days = Math.floor(hours / 24);
-
-	seconds%= 60;
-	minutes%= 60;
-	hours%= 24;
-
-	let out_string = [];
-
-	if(days > 0){
-		out_string.push(timeForm(days, " day"));
-	}
-	if(hours > 0){
-		out_string.push(timeForm(hours, " hour"));
-	}
-	if(minutes > 0){
-		out_string.push(timeForm(minutes, " minute"));
-	}
-	if(seconds > 0){
-		out_string.push(timeForm(seconds, " second"));
-	}
-
-	return out_string.join(", ");
-}
-
-//Generate the Roman numeral equivalent of a given number
-const romanNumerals = number => {
-	let romanNum = "";
-	let tenthPower = Math.ceil(logb(number, 10)) + 1;
-
-	if (number > MRV) throw "Number too large";
-	for (let i = tenthPower; i > 0; i--) {
-		let workingString = "";
-		let operatingNum = Math.floor(number / Math.pow(10, i - 1));
-		operatingNum -= Math.floor(number / Math.pow(10, i)) * 10;
-
-		//check which of 4 general categories the digit is in: 1-3, 4, 5-8, 9 (there is probably a much better way to do this)
-		if (operatingNum < 4) {
-			for (let j = 0; j < operatingNum; j++) {
-				workingString += romChars[(i - 1) * 2];
-			}
-		} else if (operatingNum == 4) {
-			workingString = romChars[(i - 1) * 2] + romChars[(i - 1) * 2 + 1];
-		} else if (operatingNum == 5) {
-			workingString = romChars[(i - 1) * 2 + 1];
-		} else if (operatingNum == 9) {
-			workingString = romChars[(i - 1) * 2] + romChars[i * 2];
-		} else {
-			workingString = romChars[(i - 1) * 2 + 1];
-			for (let j = 0; j < operatingNum - 5; j++) {
-				workingString += romChars[(i - 1) * 2];
-			}
-		}
-		romanNum += workingString;
-	}
-	return romanNum;
-}
-
-//Randomize an array and return it
-const randomize = inArr => {
-	let outArr = [];
-	let numLoops = inArr.length;
-	let indices = [];
-	for(let i in inArr){
-		indices[i] = i;
-	}
-
-	for (let i = 0; i < numLoops; i++) {
-		let index;
-		while(index == undefined){
-			index = indices[Math.floor(random(indices.length))]; 
-		}
-		outArr[i] = inArr[index];
-		delete indices[index];
-	}
-	return outArr;
-}
-
-//Return a random value between the maximum and minimum value
-const random = function (a = 0, b = 1) {
-	let minMax = minAndMax(arguments.length + 1, a, b, 0, 1);
-
-	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
-}
-
-//Generate and return a random color
-const randomColor = () => {
-	let r = Math.floor(random(255));
-	let g = Math.floor(random(255));
-	let b = Math.floor(random(255));
-
-	return new Color(r, g, b);
-}
-
-const removeFromArray = (arr, val) => {
-	let i = arr.indexOf(val);
-	if(i != -1) arr.splice(i, 1);
-}
-//endregion MISC
-//endregion FUNCTIONS
-//endregion CONSTANTS
+System.register("methlib", [], function (exports_1, context_1) {
+    "use strict";
+    var minAndMax, cbCheck, posAndSize, timeForm, padArr, ImageFromSrc, typeCheck, propertyCheck, Set, Color, Cell, Piece, FullPiece, Vector2, Vector3, LineInf2D, LineInf3D, LineSegment2D, LineSegment3D, CRange, Box, Cube, Collider2, Collider3, Button, Card, Deck, EllipseMode, RectMode, ColorMode, Canvas, E, PI, PHI, pieces, romChars, romVals, maxVal, MRV, IntersectionBetween, isPrime, areCoprime, isLimited, logb, gcd, lcm, modPow, eTot, carmichael, extendedEuclid, findCoprimesLessThan, findCoprimeList, limit, RSAEncrypt, RSADecrypt, MLA_Citation, prettyTime, romanNumerals, removeFromArray, randomize, random, randomColor;
+    var __moduleName = context_1 && context_1.id;
+    return {
+        setters: [],
+        execute: function () {
+            minAndMax = (minMax, defMin, defMax) => {
+                let min = minMax.length > 1 ? minMax[0] : defMin;
+                let max = minMax.length > 1 ? minMax[1] : minMax.length > 0 ? minMax[0] : defMax;
+                return [min, max];
+            };
+            cbCheck = (cb, cond, ...params) => {
+                if (cb !== undefined)
+                    if (cond)
+                        cb(params);
+            };
+            posAndSize = (obj, a, b, c, d) => {
+                if (a !== undefined) {
+                    if (Box.IsBox(a)) {
+                        obj.pos = a.pos;
+                        obj.size = a.size;
+                    }
+                    else if (Vector2.IsVector2(a)) {
+                        obj.pos = Vector2.copy(a);
+                        obj.size = new Vector2(...(Vector2.IsVector2(b) ? [b] : [b, c]));
+                    }
+                    else {
+                        obj.pos = new Vector2(a, b);
+                        obj.size = new Vector2(...(Vector2.IsVector2(c) ? [c] : [c, d]));
+                    }
+                }
+                else {
+                    obj.pos = new Vector2(0, 0);
+                    obj.size = new Vector2(0, 0);
+                }
+            };
+            timeForm = (val, measurement) => val.toString() + measurement + (val > 1 ? "s" : "");
+            exports_1("padArr", padArr = (inArr, targetLen, padStr) => {
+                let padWith = padStr === undefined ? ["0"] : Array.from(padStr);
+                for (let i = inArr.length; i < targetLen; i += padWith.length) {
+                    inArr.unshift(...padWith);
+                }
+                for (let i = inArr.length; i > targetLen; i--) {
+                    inArr.shift();
+                }
+                return inArr;
+            });
+            exports_1("ImageFromSrc", ImageFromSrc = (src) => {
+                let tempImg = new Image();
+                tempImg.src = src;
+                return tempImg;
+            });
+            exports_1("typeCheck", typeCheck = (objToCheck, ...props) => {
+                let isType = true;
+                for (let prop of props)
+                    if (!propertyCheck(objToCheck, prop))
+                        isType = false;
+                return isType;
+            });
+            exports_1("propertyCheck", propertyCheck = (objToCheck, prop) => objToCheck[prop] !== undefined);
+            Set = class Set {
+                constructor(arr) {
+                    this.union = (otherSet) => Set.union(this, otherSet);
+                    this.intersection = (otherSet) => Set.intersection(this, otherSet);
+                    this.setDiff = (otherSet) => Set.setDiff(this, otherSet);
+                    this.cartesianProduct = (otherSet) => Set.cartesianProduct(this, otherSet);
+                    this.powerSet = () => Set.powerSet(this);
+                    this.symDiff = (otherSet) => Set.symDiff(otherSet, this);
+                    this.elems = arr !== undefined ? Set.getElemsIfSet(arr) : [];
+                }
+            };
+            exports_1("Set", Set);
+            Set.IsSet = (obj) => typeCheck(obj, "elems");
+            Set.createSetIfNot = (arr) => Set.IsSet(arr) ? arr : { elems: arr };
+            Set.getElemsIfSet = (arr) => Set.IsSet(arr) ? arr.elems : arr;
+            Set.loopThroughElems = (inSet, func) => {
+                let arr = Set.getElemsIfSet(inSet);
+                for (let i of arr) {
+                    func(i);
+                }
+            };
+            Set.addGenSetToGenSet = (arrA, arrB) => {
+                Set.loopThroughElems(arrB, (elem) => {
+                    Set.addToGenSet(arrA, elem);
+                });
+            };
+            Set.addToGenSet = (arr, elem) => {
+                Set.IsSet(arr) ? arr.elems.push(elem) : arr.push(elem);
+            };
+            Set.removeDuplicateItemsFromGenSet = (arr) => {
+                let outArr = [];
+                Set.loopThroughElems(arr, (elem) => {
+                    if (!Set.elemIsInSet(elem, outArr)) {
+                        Set.addToGenSet(elem, outArr);
+                    }
+                });
+                return new Set(outArr);
+            };
+            Set.elemIsInSet = (setIn, elem) => {
+                let elems = Set.createSetIfNot(setIn).elems;
+                return elems.indexOf(elem) != -1;
+            };
+            Set.makeGenSetDense = (setIn) => new Set(Set.getElemsIfSet(setIn)
+                .filter(elem => elem != null));
+            Set.union = (a, b) => {
+                let outArr = [];
+                Set.addGenSetToGenSet(outArr, a);
+                Set.addGenSetToGenSet(outArr, b);
+                return Set.removeDuplicateItemsFromGenSet(outArr);
+            };
+            Set.intersection = (a, b) => {
+                let outArr = [];
+                Set.loopThroughElems(a, (elem) => {
+                    if (Set.elemIsInSet(elem, b)) {
+                        Set.addToGenSet(elem, outArr);
+                    }
+                });
+                return new Set(outArr);
+            };
+            Set.setDiff = (a, b) => {
+                let outArr = [];
+                Set.loopThroughElems(a, (elem) => {
+                    if (!Set.elemIsInSet(elem, b)) {
+                        Set.addToGenSet(elem, outArr);
+                    }
+                });
+                return new Set(outArr);
+            };
+            Set.cartesianProduct = (a, b) => {
+                let outArr = [];
+                Set.loopThroughElems(a, (elemA) => {
+                    Set.loopThroughElems(b, (elemB) => {
+                        Set.addToGenSet(outArr, [elemA, elemB]);
+                    });
+                });
+                return new Set(outArr);
+            };
+            Set.powerSet = (a) => {
+                let aSet = Set.getElemsIfSet(a);
+                let outArr = [];
+                for (let index = 0; index < 2 ** aSet.length; index++) {
+                    let binaryString = index.toString(2);
+                    let binaryArr = binaryString.split("");
+                    binaryArr = padArr(binaryArr, aSet.length);
+                    let elemArr = [];
+                    binaryArr.forEach((e, i) => {
+                        if (e == "1")
+                            Set.addToGenSet(elemArr, aSet[i]);
+                    });
+                    Set.addToGenSet(outArr, elemArr);
+                }
+                return new Set(outArr);
+            };
+            Set.symDiff = (a, b) => Set.setDiff(Set.union(a, b), Set.intersection(a, b));
+            Color = class Color {
+                constructor(...params) {
+                    this.getRGBHex = () => Color.getRGBHex(this);
+                    this.getRGBAHex = () => Color.getRGBAHex(this);
+                    this.getRGBFunc = () => Color.getRGBFunc(this);
+                    this.getRGBAFunc = () => Color.getRGBAFunc(this);
+                    let r = params[0];
+                    if (Color.IsRGBColor(r)) {
+                        this.r = r.r;
+                        this.g = r.g;
+                        this.b = r.b;
+                        if (typeof r.a !== undefined) {
+                            this.a = r.a;
+                        }
+                        else {
+                            this.a = params.length == 1 ? 255 : params[1];
+                        }
+                    }
+                    else {
+                        if (params.length == 0) {
+                            this.r = 0;
+                            this.g = 0;
+                            this.b = 0;
+                            this.a = 255;
+                        }
+                        else {
+                            this.r = params[0];
+                            this.g = params.length <= 2 ? params[0] : params[1];
+                            this.b = params.length <= 2 ? params[0] : params[2];
+                            this.a = params.length % 2 == 1 ? 255 : params.length == 2 ? params[1] : params[3];
+                        }
+                    }
+                }
+            };
+            exports_1("Color", Color);
+            Color.IsRGBColor = (obj) => typeCheck(obj, "r", "g", "b");
+            Color.IsHSVColor = (obj) => typeCheck(obj, "h", "s", "v");
+            Color.IsColor = (obj) => Color.IsHSVColor(obj) || Color.IsRGBColor(obj);
+            Color.getRGBHex = (color) => {
+                if (Color.IsHSVColor(color))
+                    return Color.getRGBHex(Color.HSVToRGB(color));
+                return "#" + Color.hexOfColors(color.r, color.g, color.b).join("");
+            };
+            Color.getRGBAHex = (color) => {
+                if (Color.IsHSVColor(color))
+                    return Color.getRGBAHex(Color.HSVToRGB(color));
+                return Color.getRGBHex(color) + Color.hexOfColor(color.a, "ff");
+            };
+            Color.getRGBFunc = (color) => {
+                if (Color.IsHSVColor(color))
+                    return Color.getRGBFunc(Color.HSVToRGB(color));
+                return "rgb(" + Color.limitColors(color.r, color.g, color.b).join(", ") + ")";
+            };
+            Color.getRGBAFunc = (color) => {
+                if (Color.IsHSVColor(color))
+                    return Color.getRGBAFunc(Color.HSVToRGB(color));
+                return "rgba(" + Color.limitColors(color.r, color.g, color.b, color.a).join(", ") + ")";
+            };
+            Color.hexOfColors = (...colors) => {
+                return colors.map(color => Color.hexOfColor(color));
+            };
+            Color.limitColors = (...colors) => {
+                return colors.map(color => Color.limitColor(color));
+            };
+            Color.hexOfColor = (val, def) => val ? (Color.limitColor(val) < 16 ? "0" : "") + val.toString(16) : def ? def : "00";
+            Color.limitColor = (val) => val ? limit(val, 0, 256) : 0;
+            Color.RGBtoHSV = (colorIn) => {
+                let Cmax = Math.max(colorIn.r, colorIn.g, colorIn.b);
+                let Cmin = Math.min(colorIn.r, colorIn.g, colorIn.b);
+                let delta = Cmax - Cmin;
+                let a = colorIn.a;
+                let H = 60 * (delta == 0 ? 0 :
+                    Cmax == colorIn.r ? ((colorIn.g - colorIn.b) / delta) % 6 :
+                        Cmax == colorIn.g ? ((colorIn.b - colorIn.r) / delta) + 4 :
+                            ((colorIn.r - colorIn.g) / delta) + 2);
+                let S = Cmax == 0 ? 0 : delta / Cmax;
+                return {
+                    h: H,
+                    s: S,
+                    v: Cmax,
+                    a: (a === undefined ? 255 : a)
+                };
+            };
+            Color.HSVToRGB = (colorIn) => {
+                let h = colorIn.h;
+                let s = colorIn.s;
+                let v = colorIn.v;
+                let a = colorIn.a;
+                let i = Math.floor(h * 6);
+                let f = h * 6 - i;
+                let p = v * (1 - s);
+                let q = v * (1 - f * s);
+                let t = v * (1 - (1 - f) * s);
+                let r, g, b;
+                switch (i % 6) {
+                    case 0:
+                        r = v, g = t, b = p;
+                        break;
+                    case 1:
+                        r = q, g = v, b = p;
+                        break;
+                    case 2:
+                        r = p, g = v, b = t;
+                        break;
+                    case 3:
+                        r = p, g = q, b = v;
+                        break;
+                    case 4:
+                        r = t, g = p, b = v;
+                        break;
+                    case 5:
+                        r = v, g = p, b = q;
+                        break;
+                }
+                r *= 256;
+                g *= 256;
+                b *= 256;
+                return {
+                    r, g, b,
+                    a: (a === undefined ? 255 : a)
+                };
+            };
+            Color.Black = new Color(0, 0, 0, 255);
+            Color.Grey = new Color(128, 128, 128, 255);
+            Color.Gray = new Color(128, 128, 128, 255);
+            Color.White = new Color(255, 255, 255, 255);
+            Color.Red = new Color(255, 0, 0, 255);
+            Color.Green = new Color(0, 255, 0, 255);
+            Color.Blue = new Color(0, 0, 255, 255);
+            Color.Yellow = new Color(255, 255, 0, 255);
+            Color.Purple = new Color(255, 0, 255, 255);
+            Color.Cyan = new Color(0, 255, 255, 255);
+            Color.Orange = new Color(255, 128, 0, 255);
+            Cell = class Cell {
+                constructor(isOn = false, color = new Color(), prevColor = new Color()) {
+                    this.on = isOn;
+                    this.color = color;
+                    this.prevColor = prevColor;
+                }
+            };
+            exports_1("Cell", Cell);
+            Piece = class Piece {
+                constructor(parts) {
+                    if (Vector2.IsVector2(parts[0])) {
+                        this.parts = parts;
+                    }
+                    else {
+                        this.parts = parts.map(part => new Vector2(...part));
+                    }
+                }
+            };
+            exports_1("Piece", Piece);
+            Piece.LinePieceA = new Piece([[0, 2], [1, 2], [2, 2], [3, 2]]);
+            Piece.LinePieceB = new Piece([[2, 0], [2, 1], [2, 2], [2, 3]]);
+            Piece.LinePieceC = new Piece([[0, 2], [1, 2], [2, 2], [3, 2]]);
+            Piece.LinePieceD = new Piece([[1, 0], [1, 1], [1, 2], [1, 3]]);
+            Piece.LPieceAA = new Piece([[2, 1], [0, 2], [1, 2], [2, 2]]);
+            Piece.LPieceAB = new Piece([[1, 1], [1, 2], [1, 3], [2, 3]]);
+            Piece.LPieceAC = new Piece([[0, 2], [1, 2], [2, 2], [0, 3]]);
+            Piece.LPieceAD = new Piece([[0, 1], [1, 1], [1, 2], [1, 3]]);
+            Piece.LPieceBA = new Piece([[0, 1], [0, 2], [1, 2], [2, 2]]);
+            Piece.LPieceBB = new Piece([[1, 1], [2, 1], [1, 2], [1, 3]]);
+            Piece.LPieceBC = new Piece([[0, 2], [1, 2], [2, 2], [2, 3]]);
+            Piece.LPieceBD = new Piece([[2, 1], [2, 2], [1, 3], [2, 3]]);
+            Piece.SquarePieceA = new Piece([[1, 1], [2, 1], [1, 2], [2, 2]]);
+            Piece.ZPieceAA = new Piece([[1, 1], [2, 1], [0, 2], [1, 2]]);
+            Piece.ZPieceAB = new Piece([[1, 1], [1, 2], [2, 2], [2, 3]]);
+            Piece.ZPieceAC = new Piece([[1, 2], [2, 2], [0, 3], [1, 3]]);
+            Piece.ZPieceAD = new Piece([[0, 1], [0, 2], [1, 2], [1, 3]]);
+            Piece.ZPieceBA = new Piece([[0, 1], [1, 1], [1, 2], [2, 2]]);
+            Piece.ZPieceBB = new Piece([[2, 1], [1, 2], [2, 2], [1, 3]]);
+            Piece.ZPieceBC = new Piece([[0, 2], [1, 2], [1, 3], [2, 3]]);
+            Piece.ZPieceBD = new Piece([[1, 1], [0, 2], [1, 2], [0, 3]]);
+            Piece.TPieceA = new Piece([[1, 1], [0, 2], [1, 2], [2, 2]]);
+            Piece.TPieceB = new Piece([[1, 1], [1, 2], [2, 2], [1, 3]]);
+            Piece.TPieceC = new Piece([[0, 2], [1, 2], [2, 2], [1, 3]]);
+            Piece.TPieceD = new Piece([[1, 1], [0, 2], [1, 2], [1, 3]]);
+            FullPiece = class FullPiece {
+                constructor(pieceRots, color) {
+                    this.rotations = pieceRots;
+                    this.color = color;
+                }
+            };
+            exports_1("FullPiece", FullPiece);
+            FullPiece.LinePiece = new FullPiece([Piece.LinePieceA, Piece.LinePieceB, Piece.LinePieceC, Piece.LinePieceD], Color.Cyan);
+            FullPiece.LPieceA = new FullPiece([Piece.LPieceAA, Piece.LPieceAB, Piece.LPieceAC, Piece.LPieceAD], Color.Orange);
+            FullPiece.LPieceB = new FullPiece([Piece.LPieceBA, Piece.LPieceBB, Piece.LPieceBC, Piece.LPieceBD], Color.Blue);
+            FullPiece.SquarePiece = new FullPiece([Piece.SquarePieceA, Piece.SquarePieceA, Piece.SquarePieceA, Piece.SquarePieceA], Color.Yellow);
+            FullPiece.ZPieceA = new FullPiece([Piece.ZPieceAA, Piece.ZPieceAB, Piece.ZPieceAC, Piece.ZPieceAD], Color.Green);
+            FullPiece.ZPieceB = new FullPiece([Piece.ZPieceBA, Piece.ZPieceBB, Piece.ZPieceBC, Piece.ZPieceBD], Color.Red);
+            FullPiece.TPiece = new FullPiece([Piece.TPieceA, Piece.TPieceB, Piece.TPieceC, Piece.TPieceD], Color.Purple);
+            Vector2 = class Vector2 {
+                constructor(x, y) {
+                    this.copy = () => new Vector2(this);
+                    this.add = (addend) => {
+                        let n = Vector2.add(this, addend);
+                        this.x = n.x;
+                        this.y = n.y;
+                        return this;
+                    };
+                    this.sub = (subtrahend) => {
+                        let n = Vector2.sub(this, subtrahend);
+                        this.x = n.x;
+                        this.y = n.y;
+                        return this;
+                    };
+                    this.scale = (scalar) => {
+                        let n = Vector2.scale(this, scalar);
+                        this.x = n.x;
+                        this.y = n.y;
+                        return this;
+                    };
+                    this.addBoth = (addend) => {
+                        let n = Vector2.addBoth(this, addend);
+                        this.x = n.x;
+                        this.y = n.y;
+                        return this;
+                    };
+                    this.setBoth = (val) => {
+                        let n = Vector2.setBoth(this, val);
+                        this.x = n.x;
+                        this.y = n.y;
+                        return this;
+                    };
+                    this.normalize = () => {
+                        let n = Vector2.normalize(this);
+                        this.x = n.x;
+                        this.y = n.y;
+                        return this;
+                    };
+                    this.limit = (...minMaxIn) => {
+                        let n = Vector2.limit(this, ...minMaxIn);
+                        this.x = n.x;
+                        this.y = n.y;
+                        return this;
+                    };
+                    this.heading = () => Vector2.heading(this);
+                    this.squareLength = () => Vector2.squareLength(this);
+                    this.len = () => Vector2.len(this);
+                    this.distSquared = (a) => Vector2.distSquared(a, this);
+                    this.dist = (a) => Vector2.dist(a, this);
+                    if (x !== undefined) {
+                        if (Vector2.IsVector2(x)) {
+                            this.x = x.x;
+                            this.y = x.y;
+                        }
+                        else {
+                            this.x = x;
+                            this.y = y !== undefined ? y : x;
+                        }
+                    }
+                    else {
+                        this.x = 0;
+                        this.y = 0;
+                    }
+                }
+            };
+            exports_1("Vector2", Vector2);
+            Vector2.IsVector2 = (obj) => typeCheck(obj, "x", "y");
+            Vector2.copy = (vec) => new Vector2(vec);
+            Vector2.add = (a, b) => new Vector2(a.x + b.x, a.y + b.y);
+            Vector2.sub = (a, b) => new Vector2(a.x - b.x, a.y - b.y);
+            Vector2.scale = (vec, scalar) => new Vector2(vec.x * scalar, vec.y * scalar);
+            Vector2.addBoth = (vec, addend) => new Vector2(vec.x + addend, vec.y + addend);
+            Vector2.setBoth = (vec, val) => {
+                let tempVec = Vector2.copy(vec);
+                tempVec.x = val;
+                tempVec.y = val;
+                return tempVec;
+            };
+            Vector2.normalize = (vec) => Vector2.scale(vec, 1 / Vector2.len(vec));
+            Vector2.limit = (limitee, ...minMaxIn) => {
+                let minMax = minAndMax(minMaxIn, new Vector2(-1, -1), new Vector2(1, 1));
+                return new Vector2(limit(limitee.x, minMax[0].x, minMax[1].x), limit(limitee.y, minMax[0].y, minMax[1].y));
+            };
+            Vector2.heading = (vec) => {
+                let a = Math.atan2(vec.x, vec.y);
+                a = a < 0 ? Math.PI * 2 + a : a;
+                return a;
+            };
+            Vector2.squareLength = (vec) => Math.pow(vec.x, 2) + Math.pow(vec.y, 2);
+            Vector2.len = (vec) => Math.sqrt(Vector2.squareLength(vec));
+            Vector2.distSquared = (a, b) => Vector2.squareLength(Vector2.sub(a, b));
+            Vector2.dist = (a, b) => Math.sqrt(Vector2.distSquared(a, b));
+            Vector2.fromAngle = (angle) => new Vector2(Math.sin(angle), Math.cos(angle));
+            Vector3 = class Vector3 {
+                constructor(x, y, z) {
+                    this.copy = () => new Vector3(this);
+                    this.add = (addend) => {
+                        let n = Vector3.add(this, addend);
+                        this.x = n.x;
+                        this.y = n.y;
+                        this.z = n.z;
+                        return this;
+                    };
+                    this.sub = (subtrahend) => {
+                        let n = Vector3.sub(this, subtrahend);
+                        this.x = n.x;
+                        this.y = n.y;
+                        this.z = n.z;
+                        return this;
+                    };
+                    this.scale = (scalar) => {
+                        let n = Vector3.scale(this, scalar);
+                        this.x = n.x;
+                        this.y = n.y;
+                        this.z = n.z;
+                        return this;
+                    };
+                    this.addAll = (addend) => {
+                        let n = Vector3.addAll(this, addend);
+                        this.x = n.x;
+                        this.y = n.y;
+                        this.z = n.z;
+                        return this;
+                    };
+                    this.setAll = (val) => {
+                        this.x = val;
+                        this.y = val;
+                        this.z = val;
+                        return this;
+                    };
+                    this.normalize = () => {
+                        let n = Vector3.normalize(this);
+                        this.x = n.x;
+                        this.y = n.y;
+                        this.z = n.z;
+                        return this;
+                    };
+                    this.limit = (...minMaxIn) => {
+                        let n = Vector3.limit(this, ...minMaxIn);
+                        this.x = n.x;
+                        this.y = n.y;
+                        this.z = n.z;
+                        return this;
+                    };
+                    this.heading = () => Vector3.heading(this);
+                    this.squareLength = () => Vector3.squareLength(this);
+                    this.len = () => Vector3.len(this);
+                    this.distSquared = (a) => Vector3.distSquared(a, this);
+                    this.dist = (a) => Vector3.dist(a, this);
+                    this.x = 0;
+                    this.y = 0;
+                    this.z = z !== undefined ? z : 0;
+                    if (x !== undefined) {
+                        if (Vector3.IsVector3(x)) {
+                            this.x = x.x;
+                            this.y = x.y;
+                            this.z = x.z;
+                        }
+                        else if (Vector2.IsVector2(x)) {
+                            this.x = x.x;
+                            this.y = x.y;
+                        }
+                        else {
+                            if (y !== undefined) {
+                                if (Vector2.IsVector2(y)) {
+                                    this.y = y.x;
+                                    this.z = y.y;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            exports_1("Vector3", Vector3);
+            Vector3.IsVector3 = (obj) => typeCheck(obj, "x", "y", "z");
+            Vector3.copy = (vec) => new Vector3(vec);
+            Vector3.add = (a, b) => new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+            Vector3.sub = (a, b) => new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+            Vector3.scale = (vec, scalar) => new Vector3(vec.x * scalar, vec.y * scalar, vec.z * scalar);
+            Vector3.addAll = (vec, addend) => new Vector3(vec.x + addend, vec.y + addend, vec.z + addend);
+            Vector3.setAll = (val) => new Vector3(val, val, val);
+            Vector3.normalize = (vec) => Vector3.scale(vec, 1 / Vector3.len(vec));
+            Vector3.limit = (limitee, ...minMaxIn) => {
+                let minMax = minAndMax(minMaxIn, new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
+                return new Vector3(limit(limitee.x, minMax[0].x, minMax[1].x), limit(limitee.y, minMax[0].y, minMax[1].y), limit(limitee.z, minMax[0].z, minMax[1].z));
+            };
+            Vector3.heading = (vec) => {
+                let XYVec = new Vector2(vec.x, vec.y);
+                let Phi = XYVec.heading();
+                let PhiZVec = new Vector2(vec.z, XYVec.len());
+                let Theta = PhiZVec.heading();
+                return [Phi, Theta];
+            };
+            Vector3.squareLength = (vec) => Math.pow(vec.x, 2) + Math.pow(vec.y, 2) + Math.pow(vec.z, 2);
+            Vector3.len = (vec) => Math.sqrt(Vector3.squareLength(vec));
+            Vector3.distSquared = (a, b) => Vector3.squareLength(Vector3.sub(a, b));
+            Vector3.dist = (a, b) => Math.sqrt(Vector3.distSquared(a, b));
+            Vector3.fromAngle = (phi, theta) => {
+                let XYVec = Vector2.fromAngle(phi);
+                let PhiZVec = Vector2.fromAngle(theta);
+                return new Vector3(XYVec, PhiZVec.x);
+            };
+            LineInf2D = class LineInf2D {
+                constructor(source, angleOrDest) {
+                    this.source = source;
+                    this.angle = Vector2.IsVector2(angleOrDest) ? Vector2.heading(Vector2.sub(angleOrDest, source)) : angleOrDest;
+                }
+            };
+            exports_1("LineInf2D", LineInf2D);
+            LineInf3D = class LineInf3D {
+                constructor(source, dest) {
+                    this.source = source;
+                    let angles = Vector3.sub(dest, source).heading();
+                    this.angle = angles[0];
+                    this.theta = angles[1];
+                }
+            };
+            exports_1("LineInf3D", LineInf3D);
+            LineSegment2D = class LineSegment2D {
+                constructor(a, b) {
+                    this.a = a;
+                    this.b = b;
+                }
+            };
+            exports_1("LineSegment2D", LineSegment2D);
+            LineSegment3D = class LineSegment3D {
+                constructor(a, b) {
+                    this.a = a;
+                    this.b = b;
+                }
+            };
+            exports_1("LineSegment3D", LineSegment3D);
+            CRange = class CRange {
+                constructor(start, size) {
+                    this.start = start;
+                    this.size = size;
+                }
+            };
+            exports_1("CRange", CRange);
+            Box = class Box {
+                constructor(a, b, c, d) {
+                    this.getCenter = () => Box.getCenter(this);
+                    this.render = (context) => {
+                        context.rect(this.pos.x, this.pos.y, this.size.x, this.size.y);
+                    };
+                    posAndSize(this, a, b, c, d);
+                }
+            };
+            exports_1("Box", Box);
+            Box.IsBox = (obj) => typeCheck(obj, "pos", "size");
+            Box.getCenter = (box) => Vector2.add(box.pos, Vector2.scale(box.size, 1 / 2));
+            Cube = class Cube {
+                constructor(pos, size) {
+                    this.getCenter = () => Cube.getCenter(this);
+                    this.pos = new Vector3(pos);
+                    this.size = new Vector3(size);
+                }
+            };
+            exports_1("Cube", Cube);
+            Cube.IsCube = (obj) => typeCheck(obj, "pos", "size");
+            Cube.getCenter = (cube) => Vector3.add(cube.pos, Vector3.scale(cube.size, 1 / 2));
+            Collider2 = class Collider2 extends Box {
+                constructor(a, b, c, d) {
+                    super(a, b, c, d);
+                    this.checkCollision = (colliders, uCB, dCB, lCB, rCB, aCB) => {
+                        let nextPosX = Vector2.add(this.pos, { x: this.vel.x, y: 0 });
+                        let nextPosY = Vector2.add(this.pos, { x: 0, y: this.vel.y });
+                        let nextColX = new Collider2(nextPosX, this.size);
+                        let nextColY = new Collider2(nextPosY, this.size);
+                        let uHit = false, dHit = false, lHit = false, rHit = false;
+                        for (let col of colliders) {
+                            if (col == this)
+                                continue;
+                            if (IntersectionBetween.BoxAndBox(col, nextColY)) {
+                                if (this.vel.y > 0)
+                                    uHit = true;
+                                else
+                                    dHit = true;
+                            }
+                            if (IntersectionBetween.BoxAndBox(col, nextColX)) {
+                                if (this.vel.x > 0)
+                                    lHit = true;
+                                else
+                                    rHit = true;
+                            }
+                            cbCheck(uCB, uHit, col);
+                            cbCheck(dCB, dHit, col);
+                            cbCheck(lCB, lHit, col);
+                            cbCheck(rCB, rHit, col);
+                            cbCheck(aCB, uHit || dHit || lHit || rHit, col);
+                        }
+                    };
+                    this.wallLimit = (bounds, gCB, wCB) => {
+                        let wH = false;
+                        let gH = false;
+                        if (isLimited(this.pos.x, bounds.x - this.size.x)) {
+                            this.vel.x = 0;
+                            wH = true;
+                        }
+                        if (isLimited(this.pos.y, bounds.y - this.size.y)) {
+                            this.vel.y = 0;
+                            gH = true;
+                        }
+                        cbCheck(wCB, wH);
+                        cbCheck(gCB, gH);
+                        this.pos.limit(Vector2.sub(bounds, this.size));
+                    };
+                    this.subUpdate = (updates) => {
+                        this.pos.add(Vector2.scale(this.vel, 1 / (updates ? updates : 1)));
+                    };
+                    this.update = () => { this.vel.add(this.acc); };
+                    this.vel = new Vector2();
+                    this.acc = new Vector2();
+                }
+            };
+            exports_1("Collider2", Collider2);
+            Collider2.IsCollider2 = (obj) => Box.IsBox(obj) && typeCheck(obj, "vel", "acc");
+            Collider3 = class Collider3 extends Cube {
+                constructor(pos, size) {
+                    super(pos, size);
+                    this.checkCollision = (colliders, xposCB, xnegCB, yposCB, ynegCB, zposCB, znegCB, aCB) => {
+                        let nextPosX = Vector3.add(this.pos, { x: this.vel.x, y: 0, z: 0 });
+                        let nextPosY = Vector3.add(this.pos, { x: 0, y: this.vel.y, z: 0 });
+                        let nextPosZ = Vector3.add(this.pos, { x: 0, y: 0, z: this.vel.z });
+                        let nextColX = new Collider3(nextPosX, this.size);
+                        let nextColY = new Collider3(nextPosY, this.size);
+                        let nextColZ = new Collider3(nextPosZ, this.size);
+                        let xposHit = false;
+                        let xnegHit = false;
+                        let yposHit = false;
+                        let ynegHit = false;
+                        let zposHit = false;
+                        let znegHit = false;
+                        for (let col of colliders) {
+                            if (col == this)
+                                continue;
+                            if (IntersectionBetween.CubeAndCube(col, nextColX)) {
+                                if (this.vel.x > 0)
+                                    xposHit = true;
+                                else
+                                    xnegHit = true;
+                            }
+                            if (IntersectionBetween.CubeAndCube(col, nextColY)) {
+                                if (this.vel.y > 0)
+                                    yposHit = true;
+                                else
+                                    ynegHit = true;
+                            }
+                            if (IntersectionBetween.CubeAndCube(col, nextColZ)) {
+                                if (this.vel.z > 0)
+                                    zposHit = true;
+                                else
+                                    znegHit = true;
+                            }
+                            cbCheck(xposCB, xposHit, col);
+                            cbCheck(xnegCB, xnegHit, col);
+                            cbCheck(yposCB, yposHit, col);
+                            cbCheck(ynegCB, ynegHit, col);
+                            cbCheck(zposCB, zposHit, col);
+                            cbCheck(znegCB, znegHit, col);
+                            cbCheck(aCB, xposHit || xnegHit || yposHit || ynegHit || zposHit || znegHit, col);
+                        }
+                    };
+                    this.wallLimit = (bounds, gCB, wCB) => {
+                        let wH = false;
+                        let gH = false;
+                        if (isLimited(this.pos.x, bounds.x - this.size.x)) {
+                            this.vel.x = 0;
+                            wH = true;
+                        }
+                        if (isLimited(this.pos.y, bounds.y - this.size.y)) {
+                            this.vel.y = 0;
+                            wH = true;
+                        }
+                        if (isLimited(this.pos.z, bounds.z - this.size.z)) {
+                            this.vel.z = 0;
+                            gH = true;
+                        }
+                        cbCheck(wCB, wH);
+                        cbCheck(gCB, gH);
+                        this.pos.limit(Vector3.sub(bounds, this.size));
+                    };
+                    this.subUpdate = (updates) => {
+                        this.pos.add(Vector3.scale(this.vel, 1 / (updates ? updates : 1)));
+                    };
+                    this.update = () => { this.vel.add(this.acc); };
+                    this.vel = new Vector3();
+                    this.acc = new Vector3();
+                }
+            };
+            exports_1("Collider3", Collider3);
+            Collider3.IsCollider3 = (obj) => Box.IsBox(obj) && typeCheck(obj, "vel", "acc");
+            Button = class Button extends Box {
+                constructor(onClick, a = 0, b = 0, c = 0, d = 0) {
+                    super(a, b, c, d);
+                    this.wasClicked = (clickPos) => IntersectionBetween.Point2DAndBox(clickPos, this);
+                    this.onClick = onClick;
+                }
+            };
+            exports_1("Button", Button);
+            Button.IsButton = (obj) => Box.IsBox(obj) && typeCheck(obj, "onClick");
+            Card = class Card {
+                constructor(a, b, f) {
+                    this.getVal = () => Card.getVal(this);
+                    this.flip = () => { this.flipped = !this.flipped; return this; };
+                    if (Card.IsCard(a)) {
+                        this.numI = a.numI;
+                        this.suitI = a.suitI;
+                        this.flipped = a.flipped;
+                    }
+                    else {
+                        this.numI = b !== undefined ? b : 0;
+                        this.suitI = a !== undefined ? a : 0;
+                        this.flipped = f !== undefined ? f : false;
+                    }
+                    this.num = Card.CARDVALS[this.numI];
+                    this.suit = Card.SUITS[this.suitI];
+                    this.name = this.num + this.suit;
+                    this.sprite = new Image(1000, 1000);
+                    this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
+                }
+            };
+            exports_1("Card", Card);
+            Card.IsCard = (obj) => typeCheck(obj, "numI", "suitI", "num", "suit", "name", "flipped", "sprite");
+            Card.SUITS = ['C', 'S', 'H', 'D'];
+            Card.CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            Card.cardBack = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Back.png");
+            Card.cardHighlight = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Highlight.png");
+            Card.cardOutline = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Outline.png");
+            Card.getVal = (card) => {
+                switch (card.num) {
+                    case "A":
+                        return 1;
+                    case "J":
+                    case "Q":
+                    case "K":
+                        return 10;
+                    default:
+                        return parseInt(card.num);
+                }
+            };
+            Card.flip = (card) => {
+                let temp = new Card(card);
+                temp.flipped = !temp.flipped;
+                return temp;
+            };
+            Deck = class Deck {
+                constructor() {
+                    this.shuffle = () => { this.cards = randomize(this.cards); };
+                    this.takeTopCard = () => this.cards.splice(0, 1)[0];
+                    this.takeNthCard = (n) => this.cards.splice(n, 1)[0];
+                    this.addCard = (newCard) => { this.cards.push(newCard); };
+                    this.addCards = (newCards) => { this.cards.push(...newCards); };
+                    this.cards = [];
+                    for (let i = 0; i < Card.SUITS.length; i++) {
+                        for (let j = 0; j < Card.CARDVALS.length; j++) {
+                            this.cards.push(new Card(i, j));
+                        }
+                    }
+                }
+            };
+            exports_1("Deck", Deck);
+            Deck.IsDeck = (obj) => typeCheck(obj, "cards");
+            Deck.shuffle = (deck) => {
+                let temp = new Deck();
+                temp.cards = randomize(deck.cards);
+                return temp;
+            };
+            (function (EllipseMode) {
+                EllipseMode[EllipseMode["CENTER"] = 0] = "CENTER";
+                EllipseMode[EllipseMode["CORNER"] = 1] = "CORNER";
+            })(EllipseMode || (EllipseMode = {}));
+            exports_1("EllipseMode", EllipseMode);
+            (function (RectMode) {
+                RectMode[RectMode["CENTER"] = 0] = "CENTER";
+                RectMode[RectMode["CORNER"] = 1] = "CORNER";
+            })(RectMode || (RectMode = {}));
+            exports_1("RectMode", RectMode);
+            (function (ColorMode) {
+                ColorMode[ColorMode["RGB"] = 0] = "RGB";
+                ColorMode[ColorMode["HSV"] = 1] = "HSV";
+            })(ColorMode || (ColorMode = {}));
+            exports_1("ColorMode", ColorMode);
+            Canvas = class Canvas {
+                constructor(canv) {
+                    this.strokeOff = false;
+                    this.fillOff = false;
+                    this.background = (col) => {
+                        let w = this.canv.width;
+                        let h = this.canv.height;
+                        this.ctxt.save();
+                        this.ctxt.fillStyle = Color.getRGBAHex(col);
+                        this.ctxt.fillRect(0, 0, w, h);
+                        this.ctxt.restore();
+                    };
+                    this.ellipse = (x, y, width, height) => {
+                        let xRad = width / 2;
+                        let yRad = height / 2;
+                        this.ctxt.beginPath();
+                        this.ctxt.ellipse(x, y, xRad, yRad, 0, 0, Math.PI * 2);
+                        this.fillOrStroke();
+                    };
+                    this.rect = (x, y, width, height) => {
+                        this.ctxt.beginPath();
+                        this.ctxt.rect(x, y, width, height);
+                        this.fillOrStroke();
+                    };
+                    this.line = (x1, y1, x2, y2) => {
+                        if (!this.strokeOff) {
+                            this.ctxt.beginPath();
+                            this.ctxt.moveTo(x1, y1);
+                            this.ctxt.lineTo(x2, y2);
+                            this.ctxt.stroke();
+                        }
+                    };
+                    this.point = (x, y) => {
+                        if (!this.strokeOff) {
+                            this.line(x, y, x, y);
+                        }
+                    };
+                    this.font = (fontStr) => {
+                        this.ctxt.font = fontStr;
+                    };
+                    this.text = (str, x, y) => {
+                        if (!this.fillOff) {
+                            this.ctxt.fillText(str, x, y);
+                        }
+                        if (!this.strokeOff) {
+                            this.ctxt.strokeText(str, x, y);
+                        }
+                    };
+                    this.arc = (x, y, radius, startAngle, endAngle) => {
+                        this.ctxt.beginPath();
+                        this.ctxt.arc(x, y, radius, startAngle, endAngle);
+                        1;
+                        this.fillOrStroke();
+                    };
+                    this.noStroke = () => {
+                        this.strokeOff = true;
+                    };
+                    this.stroke = (col) => {
+                        this.ctxt.strokeStyle = Color.getRGBAHex(col);
+                        this.strokeOff = false;
+                    };
+                    this.strokeWeight = (weight) => {
+                        this.ctxt.lineWidth = weight;
+                    };
+                    this.noFill = () => {
+                        this.fillOff = true;
+                    };
+                    this.fill = (col) => {
+                        this.ctxt.fillStyle = Color.getRGBAHex(col);
+                        this.fillOff = false;
+                    };
+                    this.ellipseMode = (newMode) => {
+                        this.currentEllipseMode = newMode;
+                    };
+                    this.rectMode = (newMode) => {
+                        this.currentRectMode = newMode;
+                    };
+                    this.colorMode = (newMode) => {
+                        this.currentColorMode = newMode;
+                    };
+                    this.fillOrStroke = () => {
+                        if (!this.fillOff) {
+                            this.ctxt.fill();
+                        }
+                        if (!this.strokeOff) {
+                            this.ctxt.stroke();
+                        }
+                    };
+                    this.canv = canv;
+                    this.ctxt = canv.getContext("2d");
+                }
+            };
+            exports_1("Canvas", Canvas);
+            exports_1("E", E = 2.7182818);
+            exports_1("PI", PI = 3.1415926);
+            exports_1("PHI", PHI = 1.6180339);
+            exports_1("pieces", pieces = [FullPiece.LinePiece, FullPiece.LPieceA, FullPiece.LPieceB, FullPiece.SquarePiece, FullPiece.ZPieceA, FullPiece.ZPieceB, FullPiece.TPiece]);
+            romChars = ['I', 'V', 'X', 'L', 'D', 'C', 'M', 'v', 'x', 'l', 'd', 'c', 'm'];
+            romVals = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000];
+            maxVal = romVals[romVals.length - 1] * 3;
+            for (let i = 0; i < romVals.length / 2; i++) {
+                maxVal += romVals[i * 2 + 1];
+            }
+            MRV = maxVal;
+            IntersectionBetween = class IntersectionBetween {
+            };
+            exports_1("IntersectionBetween", IntersectionBetween);
+            IntersectionBetween.Point1DAndRange = (point, range) => point > range.start && point < range.start + range.size;
+            IntersectionBetween.RangeAndRange = (a, b) => (a.start + a.size >= b.start) && (b.start + b.size >= a.start);
+            IntersectionBetween.Point2DAndPoint2D = (pointA, pointB) => pointA.x == pointB.x && pointA.y == pointB.y;
+            IntersectionBetween.Point2DAndPoint3D = (pointA, pointB) => IntersectionBetween.Point2DAndPoint2D(pointA, pointB) && pointB.z == 0;
+            IntersectionBetween.Point2DAndLineInf2D = (point, line) => {
+                let pointToSourceVec = Vector2.sub(line.source, point);
+                return line.angle == pointToSourceVec.heading();
+            };
+            IntersectionBetween.Point2DAndLineSegment2D = (point, line) => {
+                let pointToAVec = Vector2.sub(line.a, point);
+                let AToBVec = Vector2.sub(line.b, line.a);
+                return AToBVec.heading() == pointToAVec.heading() && pointToAVec.squareLength() < AToBVec.squareLength();
+            };
+            IntersectionBetween.Point2DAndBox = (point, box) => {
+                let xRange = new CRange(box.pos.x, box.size.x);
+                let yRange = new CRange(box.pos.y, box.size.y);
+                return IntersectionBetween.Point1DAndRange(point.x, xRange) && IntersectionBetween.Point1DAndRange(point.y, yRange);
+            };
+            IntersectionBetween.LineInf2DAndBox = (line, box) => {
+                let boxCorners = [
+                    box.pos,
+                    Vector2.add(box.pos, { x: box.size.x, y: 0 }),
+                    Vector2.add(box.pos, { x: 0, y: box.size.y }),
+                    Vector2.add(box.pos, box.size)
+                ];
+                let pointToCornerLines = boxCorners.map(corner => new LineInf2D(line.source, corner));
+                let pointToCornerAngles = pointToCornerLines.map(PTCL => PTCL.angle);
+                let angleA = Math.max(...pointToCornerAngles);
+                let angleB = Math.min(...pointToCornerAngles);
+                return line.angle < angleA && line.angle > angleB;
+            };
+            IntersectionBetween.LineInf2DAndCube = (line, cube) => {
+                let boxCorners = [
+                    cube.pos,
+                    Vector2.add(cube.pos, { x: cube.size.x, y: 0 }),
+                    Vector2.add(cube.pos, { x: 0, y: cube.size.y }),
+                    Vector2.add(cube.pos, cube.size)
+                ];
+                let pointToCornerLines = boxCorners.map(corner => new LineInf2D(line.source, corner));
+                let pointToCornerAngles = pointToCornerLines.map(PTCL => PTCL.angle);
+                let angleA = Math.max(...pointToCornerAngles);
+                let angleB = Math.min(...pointToCornerAngles);
+                return line.angle < angleA && line.angle > angleB;
+            };
+            IntersectionBetween.BoxAndBox = (a, b) => {
+                let xa = new CRange(a.pos.x, a.size.x);
+                let xb = new CRange(b.pos.x, b.size.x);
+                let ya = new CRange(a.pos.y, a.size.y);
+                let yb = new CRange(b.pos.y, b.size.y);
+                return (IntersectionBetween.RangeAndRange(xa, xb) && IntersectionBetween.RangeAndRange(ya, yb));
+            };
+            IntersectionBetween.CubeAndCube = (a, b) => {
+                let xya = new Box(new Vector2(a.pos.x, a.pos.y), new Vector2(a.size.x, a.size.y));
+                let xyb = new Box(new Vector2(b.pos.x, b.pos.y), new Vector2(b.size.x, b.size.y));
+                let xza = new Box(new Vector2(a.pos.x, a.pos.z), new Vector2(a.size.x, a.size.z));
+                let xzb = new Box(new Vector2(b.pos.x, b.pos.z), new Vector2(b.size.x, b.size.z));
+                let yza = new Box(new Vector2(a.pos.y, a.pos.z), new Vector2(a.size.y, a.size.z));
+                let yzb = new Box(new Vector2(b.pos.y, b.pos.z), new Vector2(b.size.y, b.size.z));
+                return (IntersectionBetween.BoxAndBox(xya, xyb) && IntersectionBetween.BoxAndBox(xza, xzb) && IntersectionBetween.BoxAndBox(yza, yzb));
+            };
+            exports_1("isPrime", isPrime = (val) => {
+                for (let i = 2; i < Math.sqrt(val); i++) {
+                    if (isPrime(i)) {
+                        if (gcd(i, val) != 1) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            });
+            exports_1("areCoprime", areCoprime = (a, b) => gcd(a, b) == 1);
+            exports_1("isLimited", isLimited = (limitee, ...minMaxIn) => {
+                let minMax = minAndMax(minMaxIn, 0, 1);
+                return (limitee <= minMax[0] || limitee >= minMax[1]);
+            });
+            exports_1("logb", logb = (val, base) => Math.log(val) / Math.log(base));
+            exports_1("gcd", gcd = (a, b) => {
+                while (true) {
+                    if (a > b) {
+                        a -= b;
+                    }
+                    else if (b > a) {
+                        b -= a;
+                    }
+                    else {
+                        return a;
+                    }
+                }
+            });
+            exports_1("lcm", lcm = (a, b) => (a * b) / gcd(a, b));
+            exports_1("modPow", modPow = (b, e, m) => {
+                let modPow = 1;
+                for (let i = 0; i < e; i++) {
+                    modPow *= b;
+                    modPow %= m;
+                }
+                return modPow;
+            });
+            exports_1("eTot", eTot = (val) => {
+                let numCoprimes = 0;
+                for (let i = 0; i < val; i++) {
+                    if (gcd(i, val) == 1) {
+                        numCoprimes++;
+                    }
+                }
+                return numCoprimes;
+            });
+            exports_1("carmichael", carmichael = (val) => {
+                let m = 0;
+                let coprimes = findCoprimesLessThan(val);
+                while (m < val * 10) {
+                    m++;
+                    let success = true;
+                    for (let a of coprimes) {
+                        if (Math.pow(a, m) % val != 1) {
+                            success = false;
+                            break;
+                        }
+                    }
+                    if (!success) {
+                        continue;
+                    }
+                    else {
+                        return m;
+                    }
+                }
+                return -1;
+            });
+            exports_1("extendedEuclid", extendedEuclid = (a, b) => {
+                let s = 0;
+                let old_s = 1;
+                let t = 1;
+                let old_t = 0;
+                let r = b;
+                let old_r = a;
+                let quot = 0;
+                let temp = 0;
+                while (r != 0) {
+                    quot = old_r / r;
+                    temp = r;
+                    r = old_r - quot * temp;
+                    old_r = temp;
+                    temp = s;
+                    s = old_s - quot * temp;
+                    old_s = temp;
+                    temp = t;
+                    t = old_t - quot * temp;
+                    old_t = temp;
+                }
+                return old_s;
+            });
+            exports_1("findCoprimesLessThan", findCoprimesLessThan = (n) => {
+                let coprimes = [];
+                for (let i = 0; i < n; i++) {
+                    if (areCoprime(i, n)) {
+                        coprimes.push(i);
+                    }
+                }
+                return coprimes;
+            });
+            exports_1("findCoprimeList", findCoprimeList = (n, len) => {
+                let coprimes = [];
+                let checkNum = 1;
+                while (coprimes.length < len) {
+                    if (areCoprime(checkNum, n)) {
+                        coprimes.push(checkNum);
+                    }
+                    checkNum++;
+                }
+                return coprimes;
+            });
+            exports_1("limit", limit = (limitee, ...minMaxIn) => {
+                let minMax = minAndMax(minMaxIn, 0, 1);
+                if (limitee <= minMax[0])
+                    return minMax[0];
+                if (limitee >= minMax[1])
+                    return minMax[1];
+                return limitee;
+            });
+            exports_1("RSAEncrypt", RSAEncrypt = (message, n, k) => {
+                let BEM = [];
+                let CA = message.split("");
+                for (let i in CA) {
+                    let NC = parseInt(CA[i]);
+                    BEM[i] = modPow(NC, k, n);
+                }
+                return BEM;
+            });
+            exports_1("RSADecrypt", RSADecrypt = (ENCMess, n, j) => {
+                let message = "";
+                for (let i of ENCMess) {
+                    let NC = modPow(i, j, n);
+                    message += NC.toString();
+                }
+                return message;
+            });
+            exports_1("MLA_Citation", MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
+                let modQuote;
+                if (lineEnd - lineStart < 2) {
+                    modQuote = quote;
+                }
+                else {
+                    let quoteWords = quote.split(" ");
+                    modQuote = quoteWords[0] + " " + quoteWords[1] + " ... " + quoteWords[quoteWords.length - 2] + " " + quoteWords[quoteWords.length - 1];
+                }
+                return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
+            });
+            exports_1("prettyTime", prettyTime = (time) => {
+                let seconds = time;
+                let minutes = Math.floor(seconds / 60);
+                let hours = Math.floor(minutes / 60);
+                let days = Math.floor(hours / 24);
+                seconds %= 60;
+                minutes %= 60;
+                hours %= 24;
+                let out_string = [];
+                if (days > 0) {
+                    out_string.push(timeForm(days, " day"));
+                }
+                if (hours > 0) {
+                    out_string.push(timeForm(hours, " hour"));
+                }
+                if (minutes > 0) {
+                    out_string.push(timeForm(minutes, " minute"));
+                }
+                if (seconds > 0) {
+                    out_string.push(timeForm(seconds, " second"));
+                }
+                return out_string.join(", ");
+            });
+            exports_1("romanNumerals", romanNumerals = (val) => {
+                let romanNum = "";
+                let tenthPower = Math.ceil(logb(val, 10)) + 1;
+                if (val > MRV)
+                    throw "Number too large";
+                for (let i = tenthPower; i > 0; i--) {
+                    let workingString = "";
+                    let operatingNum = Math.floor(val / Math.pow(10, i - 1));
+                    operatingNum -= Math.floor(val / Math.pow(10, i)) * 10;
+                    if (operatingNum < 4) {
+                        for (let j = 0; j < operatingNum; j++) {
+                            workingString += romChars[(i - 1) * 2];
+                        }
+                    }
+                    else if (operatingNum == 4) {
+                        workingString = romChars[(i - 1) * 2] + romChars[(i - 1) * 2 + 1];
+                    }
+                    else if (operatingNum == 5) {
+                        workingString = romChars[(i - 1) * 2 + 1];
+                    }
+                    else if (operatingNum == 9) {
+                        workingString = romChars[(i - 1) * 2] + romChars[i * 2];
+                    }
+                    else {
+                        workingString = romChars[(i - 1) * 2 + 1];
+                        for (let j = 0; j < operatingNum - 5; j++) {
+                            workingString += romChars[(i - 1) * 2];
+                        }
+                    }
+                    romanNum += workingString;
+                }
+                return romanNum;
+            });
+            exports_1("removeFromArray", removeFromArray = (arr, val) => {
+                let i = arr.indexOf(val);
+                if (i != -1)
+                    arr.splice(i, 1);
+                return arr;
+            });
+            exports_1("randomize", randomize = (inArr) => {
+                let outArr = [];
+                let numLoops = inArr.length;
+                let indices = [];
+                for (let i = 0; i < numLoops; i++) {
+                    indices[i] = i;
+                }
+                for (let i = 0; i < numLoops; i++) {
+                    let index = indices[Math.floor(random(indices.length))];
+                    outArr[i] = inArr[index];
+                    indices = removeFromArray(indices, index);
+                }
+                return outArr;
+            });
+            exports_1("random", random = (...minMaxIn) => {
+                let minMax = minAndMax(minMaxIn, 0, 1);
+                return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
+            });
+            exports_1("randomColor", randomColor = () => {
+                let r = Math.floor(random(255));
+                let g = Math.floor(random(255));
+                let b = Math.floor(random(255));
+                return new Color(r, g, b);
+            });
+        }
+    };
+});
