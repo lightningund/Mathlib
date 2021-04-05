@@ -2064,7 +2064,7 @@ export class IntersectionBetween {
 
 	//sphere & sphere
 
-	//NCubeN & NCube
+	//NCube & NCube
 	static readonly NCubeAndNCube = (a: TNCube, b: TNCube): boolean => {
 		let aRanges: CRange[] = a.pos.coords.map((elem, ind) => new CRange(elem, a.size.coords[ind]));
 		let bRanges: CRange[] = b.pos.coords.map((elem, ind) => new CRange(elem, b.size.coords[ind]));
@@ -2075,6 +2075,7 @@ export class IntersectionBetween {
 	}
 }
 //#endregion
+
 /**
  * Checks if a given object is of a given type
  * @param objToCheck The object you want to check is of type
