@@ -7,7 +7,7 @@ export interface ISet {
 export type genSet = any[] | ISet;
 
 /**
- * Set (for set theory stuff I don't know I wanted to add this if you have a problem with it go write your own library dipshit)
+ * Set (for set theory stuff I don't know I wanted to add this if you have a problem with it go write your own library)
  * @class
  */
 export class Set implements ISet {
