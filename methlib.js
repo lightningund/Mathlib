@@ -810,6 +810,7 @@ export class Collider2 extends Box {
     constructor(a, b, c, d, solid) {
         super(a, b, c, d);
         this.checkCollision = (colliders, callbacks) => {
+            const zeroRange = new CRange(-0.01, 0.02);
             let nextPosX = Vector2.add(this.pos, { x: this.vel.x, y: 0 });
             let nextPosY = Vector2.add(this.pos, { x: 0, y: this.vel.y });
             let nextColX = new Collider2(nextPosX, this.size);
@@ -818,7 +819,8 @@ export class Collider2 extends Box {
             for (let col of colliders) {
                 if (col === this)
                     continue;
-                if (IntersectionBetween.BoxAndBox(col, nextColY)) {
+                if (IntersectionBetween.BoxAndBox(col, nextColY)
+                    && !IntersectionBetween.Point1DAndRange(this.vel.y, zeroRange)) {
                     cbCheck(callbacks.yany, true, col);
                     if (this.vel.y > 0) {
                         cbCheck(callbacks.ypos, true, col);
@@ -834,7 +836,8 @@ export class Collider2 extends Box {
                     }
                     hit = true;
                 }
-                else if (IntersectionBetween.BoxAndBox(col, nextColX)) {
+                else if (IntersectionBetween.BoxAndBox(col, nextColX)
+                    && !IntersectionBetween.Point1DAndRange(this.vel.x, zeroRange)) {
                     cbCheck(callbacks.xany, true, col);
                     if (this.vel.x > 0) {
                         cbCheck(callbacks.xpos, true, col);
