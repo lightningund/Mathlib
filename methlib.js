@@ -816,9 +816,10 @@ export class Collider2 extends Box {
             let nextColY = new Collider2(nextPosY, this.size);
             let hit = false;
             for (let col of colliders) {
-                if (col == this)
+                if (col === this)
                     continue;
                 if (IntersectionBetween.BoxAndBox(col, nextColY)) {
+                    cbCheck(callbacks.yany, true, col);
                     if (this.vel.y > 0)
                         cbCheck(callbacks.ypos, true, col);
                     else
@@ -826,13 +827,16 @@ export class Collider2 extends Box {
                     hit = true;
                 }
                 if (IntersectionBetween.BoxAndBox(col, nextColX)) {
+                    cbCheck(callbacks.xany, true, col);
                     if (this.vel.x > 0)
                         cbCheck(callbacks.xpos, true, col);
                     else
                         cbCheck(callbacks.xneg, true, col);
                     hit = true;
                 }
-                cbCheck(callbacks.general, hit, col);
+                cbCheck(callbacks.any, hit, col);
+                if (hit)
+                    return;
             }
         };
         this.wallLimit = (bounds, callbacks) => {

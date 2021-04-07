@@ -1292,9 +1292,11 @@ export class Collider2 extends Box implements ICollider2 {
 		callbacks: {
 			yneg?: (a: TCollider2) => any,
 			ypos?: (a: TCollider2) => any,
+			yany?: (a: TCollider2) => any,
 			xneg?: (a: TCollider2) => any,
 			xpos?: (a: TCollider2) => any,
-			general?: (a: TCollider2) => any
+			xany?: (a: TCollider2) => any,
+			any?: (a: TCollider2) => any
 		},
 	): void => {
 		let nextPosX = Vector2.add(this.pos, { x: this.vel.x, y: 0 });
@@ -1306,19 +1308,22 @@ export class Collider2 extends Box implements ICollider2 {
 		let hit: boolean = false;
 
 		for (let col of colliders) {
-			if (col == this) continue;
+			if (col === this) continue;
 			if (IntersectionBetween.BoxAndBox(col, nextColY)) {
+				cbCheck(callbacks.yany, true, col);
 				if (this.vel.y > 0) cbCheck(callbacks.ypos, true, col);
 				else cbCheck(callbacks.yneg, true, col);
 				hit = true;
 			}
 			if (IntersectionBetween.BoxAndBox(col, nextColX)) {
+				cbCheck(callbacks.xany, true, col);
 				if (this.vel.x > 0) cbCheck(callbacks.xpos, true, col);
 				else cbCheck(callbacks.xneg, true, col);
 				hit = true;
 			}
 
-			cbCheck(callbacks.general, hit, col);
+			cbCheck(callbacks.any, hit, col);
+			if(hit) return;
 		}
 	}
 
