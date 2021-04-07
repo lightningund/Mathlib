@@ -807,7 +807,7 @@ NCube.getCenter = (cube) => VectorN.add(cube.pos, VectorN.scale(cube.size, 1 / 2
  */
 export class Collider2 extends Box {
     //#endregion
-    constructor(a, b, c, d) {
+    constructor(a, b, c, d, solid) {
         super(a, b, c, d);
         this.checkCollision = (colliders, callbacks) => {
             let nextPosX = Vector2.add(this.pos, { x: this.vel.x, y: 0 });
@@ -820,18 +820,34 @@ export class Collider2 extends Box {
                     continue;
                 if (IntersectionBetween.BoxAndBox(col, nextColY)) {
                     cbCheck(callbacks.yany, true, col);
-                    if (this.vel.y > 0)
+                    if (this.vel.y > 0) {
                         cbCheck(callbacks.ypos, true, col);
-                    else
+                        if (col.solid && this.solid) {
+                            this.pos.y = col.pos.y - this.size.y;
+                        }
+                    }
+                    else {
                         cbCheck(callbacks.yneg, true, col);
+                        if (col.solid && this.solid) {
+                            this.pos.y = this.pos.y - col.size.y;
+                        }
+                    }
                     hit = true;
                 }
                 if (IntersectionBetween.BoxAndBox(col, nextColX)) {
                     cbCheck(callbacks.xany, true, col);
-                    if (this.vel.x > 0)
+                    if (this.vel.x > 0) {
                         cbCheck(callbacks.xpos, true, col);
-                    else
+                        if (col.solid && this.solid) {
+                            this.pos.x = col.pos.x - this.size.x;
+                        }
+                    }
+                    else {
                         cbCheck(callbacks.xneg, true, col);
+                        if (col.solid && this.solid) {
+                            this.pos.x = this.pos.x - col.size.x;
+                        }
+                    }
                     hit = true;
                 }
                 cbCheck(callbacks.any, hit, col);
@@ -856,6 +872,7 @@ export class Collider2 extends Box {
         this.update = () => { this.vel.add(this.acc); };
         this.vel = new Vector2();
         this.acc = new Vector2();
+        this.solid = solid === undefined ? true : solid;
     }
 }
 Collider2.IsCollider2 = (obj) => Box.IsBox(obj) && typeCheck(obj, "vel", "acc");

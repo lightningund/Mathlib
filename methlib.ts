@@ -1204,6 +1204,7 @@ export class NCube implements INCube {
 export interface ICollider2 extends IBox {
 	vel: Vector2;
 	acc: Vector2;
+	solid: boolean;
 }
 
 export type TCollider2 = ICollider2;
@@ -1217,6 +1218,7 @@ export class Collider2 extends Box implements ICollider2 {
 
 	vel: Vector2;
 	acc: Vector2;
+	solid: boolean;
 	//#region Constructors
 	/**
 	 * Create a general Collider with default position and default size
@@ -1279,12 +1281,14 @@ export class Collider2 extends Box implements ICollider2 {
 		a?: any,
 		b?: any,
 		c?: any,
-		d?: any
+		d?: any,
+		solid?: boolean
 	) {
 		super(a, b, c, d);
 
 		this.vel = new Vector2();
 		this.acc = new Vector2();
+		this.solid = solid === undefined ? true : solid;
 	}
 
 	readonly checkCollision = (
@@ -1311,14 +1315,34 @@ export class Collider2 extends Box implements ICollider2 {
 			if (col === this) continue;
 			if (IntersectionBetween.BoxAndBox(col, nextColY)) {
 				cbCheck(callbacks.yany, true, col);
-				if (this.vel.y > 0) cbCheck(callbacks.ypos, true, col);
-				else cbCheck(callbacks.yneg, true, col);
+				if (this.vel.y > 0) {
+					cbCheck(callbacks.ypos, true, col);
+					if (col.solid && this.solid) {
+						this.pos.y = col.pos.y - this.size.y;
+					}
+				}
+				else {
+					cbCheck(callbacks.yneg, true, col);
+					if (col.solid && this.solid) {
+						this.pos.y = this.pos.y - col.size.y;
+					}
+				}
 				hit = true;
 			}
 			if (IntersectionBetween.BoxAndBox(col, nextColX)) {
 				cbCheck(callbacks.xany, true, col);
-				if (this.vel.x > 0) cbCheck(callbacks.xpos, true, col);
-				else cbCheck(callbacks.xneg, true, col);
+				if (this.vel.x > 0) {
+					cbCheck(callbacks.xpos, true, col);
+					if (col.solid && this.solid) {
+						this.pos.x = col.pos.x - this.size.x;
+					}
+				}
+				else {
+					cbCheck(callbacks.xneg, true, col);
+					if (col.solid && this.solid) {
+						this.pos.x = this.pos.x - col.size.x;
+					}
+				}
 				hit = true;
 			}
 
