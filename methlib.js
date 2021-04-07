@@ -839,7 +839,9 @@ export class Collider2 extends Box {
                     if (this.vel.x > 0) {
                         cbCheck(callbacks.xpos, true, col);
                         if (col.solid && this.solid) {
+                            const temp = this.pos.x;
                             this.pos.x = col.pos.x - this.size.x;
+                            console.log(temp, "->", this.pos.x);
                         }
                     }
                     else {
