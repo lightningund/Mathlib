@@ -829,12 +829,12 @@ export class Collider2 extends Box {
                     else {
                         cbCheck(callbacks.yneg, true, col);
                         if (col.solid && this.solid) {
-                            this.pos.y = this.pos.y - col.size.y;
+                            this.pos.y = col.pos.y + col.size.y;
                         }
                     }
                     hit = true;
                 }
-                if (IntersectionBetween.BoxAndBox(col, nextColX)) {
+                else if (IntersectionBetween.BoxAndBox(col, nextColX)) {
                     cbCheck(callbacks.xany, true, col);
                     if (this.vel.x > 0) {
                         cbCheck(callbacks.xpos, true, col);
@@ -847,7 +847,7 @@ export class Collider2 extends Box {
                     else {
                         cbCheck(callbacks.xneg, true, col);
                         if (col.solid && this.solid) {
-                            this.pos.x = this.pos.x - col.size.x;
+                            this.pos.x = col.pos.x + col.size.x;
                         }
                     }
                     hit = true;
@@ -1218,9 +1218,8 @@ function minAndMax(minMax, defMin, defMax) {
     return [min, max];
 }
 function cbCheck(cb, cond, ...params) {
-    if (cb !== undefined)
-        if (cond)
-            cb(params);
+    if (cb !== undefined && cond)
+        cb(params);
 }
 function posAndSize(obj, a, b, c, d) {
     if (a !== undefined) {
