@@ -1204,7 +1204,6 @@ export class NCube implements INCube {
 export interface ICollider2 extends IBox {
 	vel: Vector2;
 	acc: Vector2;
-	solid: boolean;
 }
 
 export type TCollider2 = ICollider2;
@@ -1218,7 +1217,6 @@ export class Collider2 extends Box implements ICollider2 {
 
 	vel: Vector2;
 	acc: Vector2;
-	solid: boolean;
 	//#region Constructors
 	/**
 	 * Create a general Collider with default position and default size
@@ -1281,14 +1279,12 @@ export class Collider2 extends Box implements ICollider2 {
 		a?: any,
 		b?: any,
 		c?: any,
-		d?: any,
-		solid?: boolean
+		d?: any
 	) {
 		super(a, b, c, d);
 
 		this.vel = new Vector2();
 		this.acc = new Vector2();
-		this.solid = solid === undefined ? true : solid;
 	}
 
 	readonly checkCollision = (
@@ -1303,55 +1299,26 @@ export class Collider2 extends Box implements ICollider2 {
 			any?: (a: TCollider2) => any
 		},
 	): void => {
-		const zeroRange = new CRange(-0.01, 0.02);
+		const nextPosX = Vector2.add(this.pos, { x: this.vel.x, y: 0 });
+		const nextPosY = Vector2.add(this.pos, { x: 0, y: this.vel.y });
 
-		let nextPosX = Vector2.add(this.pos, { x: this.vel.x, y: 0 });
-		let nextPosY = Vector2.add(this.pos, { x: 0, y: this.vel.y });
-
-		let nextColX = new Collider2(nextPosX, this.size);
-		let nextColY = new Collider2(nextPosY, this.size);
+		const nextColX = new Collider2(nextPosX, this.size);
+		const nextColY = new Collider2(nextPosY, this.size);
 
 		let hit: boolean = false;
 
 		for (let col of colliders) {
 			if (col === this) continue;
-			if (
-				IntersectionBetween.BoxAndBox(col, nextColY)
-				&& !IntersectionBetween.Point1DAndRange(this.vel.y, zeroRange)
-			) {
+			if (IntersectionBetween.BoxAndBox(col, nextColY)) {
 				cbCheck(callbacks.yany, true, col);
-				if (this.vel.y > 0) {
-					cbCheck(callbacks.ypos, true, col);
-					if (col.solid && this.solid) {
-						this.pos.y = col.pos.y - this.size.y;
-					}
-				}
-				else {
-					cbCheck(callbacks.yneg, true, col);
-					if (col.solid && this.solid) {
-						this.pos.y = col.pos.y + col.size.y;
-					}
-				}
+				if (this.vel.y > 0) cbCheck(callbacks.ypos, true, col);
+				else cbCheck(callbacks.yneg, true, col);
 				hit = true;
-			} else if (
-				IntersectionBetween.BoxAndBox(col, nextColX)
-				&& !IntersectionBetween.Point1DAndRange(this.vel.x, zeroRange)
-			) {
+			}
+			if (IntersectionBetween.BoxAndBox(col, nextColX)) {
 				cbCheck(callbacks.xany, true, col);
-				if (this.vel.x > 0) {
-					cbCheck(callbacks.xpos, true, col);
-					if (col.solid && this.solid) {
-						const temp = this.pos.x;
-						this.pos.x = col.pos.x - this.size.x;
-						console.log(temp, "->", this.pos.x);
-					}
-				}
-				else {
-					cbCheck(callbacks.xneg, true, col);
-					if (col.solid && this.solid) {
-						this.pos.x = col.pos.x + col.size.x;
-					}
-				}
+				if (this.vel.x > 0) cbCheck(callbacks.xpos, true, col);
+				else cbCheck(callbacks.xneg, true, col);
 				hit = true;
 			}
 
