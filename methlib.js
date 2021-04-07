@@ -819,19 +819,19 @@ export class Collider2 extends Box {
                 if (col === this)
                     continue;
                 if (IntersectionBetween.BoxAndBox(col, nextColY)) {
-                    cbCheck(callbacks.yany, true, col);
                     if (this.vel.y > 0)
                         cbCheck(callbacks.ypos, true, col);
                     else
                         cbCheck(callbacks.yneg, true, col);
+                    cbCheck(callbacks.yany, true, col);
                     hit = true;
                 }
                 if (IntersectionBetween.BoxAndBox(col, nextColX)) {
-                    cbCheck(callbacks.xany, true, col);
                     if (this.vel.x > 0)
                         cbCheck(callbacks.xpos, true, col);
                     else
                         cbCheck(callbacks.xneg, true, col);
+                    cbCheck(callbacks.xany, true, col);
                     hit = true;
                 }
                 cbCheck(callbacks.any, hit, col);
