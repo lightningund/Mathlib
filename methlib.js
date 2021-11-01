@@ -1,100 +1,96 @@
 /**
- * Set (for set theory stuff I don't know I wanted to add this if you have a problem with it go write your own library)
+ * Set (for set theory stuff)
  * @class
  */
-export class Set {
+export class CSet {
     constructor(arr) {
-        this.union = (otherSet) => Set.union(this, otherSet);
-        this.intersection = (otherSet) => Set.intersection(this, otherSet);
-        this.setDiff = (otherSet) => Set.setDiff(this, otherSet);
-        this.cartesianProduct = (otherSet) => Set.cartesianProduct(this, otherSet);
-        this.powerSet = () => Set.powerSet(this);
-        this.symDiff = (otherSet) => Set.symDiff(otherSet, this);
-        this.elems = arr !== undefined ? Set.getElemsIfSet(arr) : [];
+        this.union = (otherSet) => CSet.union(this, otherSet);
+        this.intersection = (otherSet) => CSet.intersection(this, otherSet);
+        this.setDiff = (otherSet) => CSet.setDiff(this, otherSet);
+        this.cartesianProduct = (otherSet) => CSet.cartesianProduct(this, otherSet);
+        this.powerSet = () => CSet.powerSet(this);
+        this.symDiff = (otherSet) => CSet.symDiff(otherSet, this);
+        this.elems = arr !== undefined ? CSet.getElemsIfSet(arr) : [];
     }
 }
-Set.IsSet = (obj) => typeCheck(obj, "elems");
-Set.createSetIfNot = (arr) => Set.IsSet(arr) ? arr : { elems: arr };
-Set.getElemsIfSet = (arr) => Set.IsSet(arr) ? arr.elems : arr;
-Set.loopThroughElems = (inSet, func) => {
-    let arr = Set.getElemsIfSet(inSet);
-    for (let i of arr) {
-        func(i);
-    }
+CSet.IsSet = (obj) => typeCheck(obj, "elems");
+CSet.createSetIfNot = (arr) => CSet.IsSet(arr) ? arr : { elems: arr };
+CSet.getElemsIfSet = (arr) => CSet.IsSet(arr) ? arr.elems : arr;
+CSet.loopThroughElems = (inSet, func) => {
+    CSet.getElemsIfSet(inSet).forEach(i => func(i));
 };
-Set.addGenSetToGenSet = (arrA, arrB) => {
-    Set.loopThroughElems(arrB, (elem) => {
-        Set.addToGenSet(arrA, elem);
+CSet.addGenSetToGenSet = (base, toAdd) => {
+    CSet.loopThroughElems(toAdd, (elem) => {
+        CSet.addToGenSet(base, elem);
     });
 };
-Set.addToGenSet = (arr, elem) => {
-    Set.IsSet(arr) ? arr.elems.push(elem) : arr.push(elem);
+CSet.addToGenSet = (arr, elem) => {
+    CSet.IsSet(arr) ? arr.elems.push(elem) : arr.push(elem);
 };
-Set.removeDuplicateItemsFromGenSet = (arr) => {
+CSet.removeDuplicateItemsFromGenSet = (arr) => {
     let outArr = [];
-    Set.loopThroughElems(arr, (elem) => {
-        if (!Set.elemIsInSet(elem, outArr)) {
-            Set.addToGenSet(elem, outArr);
+    CSet.loopThroughElems(arr, (elem) => {
+        if (!CSet.elemIsInSet(elem, outArr)) {
+            CSet.addToGenSet(elem, outArr);
         }
     });
-    return new Set(outArr);
+    return new CSet(outArr);
 };
-Set.elemIsInSet = (setIn, elem) => {
-    let elems = Set.createSetIfNot(setIn).elems;
-    return elems.indexOf(elem) != -1;
+CSet.elemIsInSet = (setIn, elem) => {
+    let elems = CSet.createSetIfNot(setIn).elems;
+    return elems.indexOf(elem) !== -1;
 };
-Set.makeGenSetDense = (setIn) => new Set(Set.getElemsIfSet(setIn)
-    .filter(elem => elem != null));
-Set.union = (a, b) => {
+CSet.makeGenSetDense = (setIn) => new CSet(CSet.getElemsIfSet(setIn).filter(elem => elem !== null));
+CSet.union = (a, b) => {
+    const outArr = [];
+    CSet.addGenSetToGenSet(outArr, a);
+    CSet.addGenSetToGenSet(outArr, b);
+    return CSet.removeDuplicateItemsFromGenSet(outArr);
+};
+CSet.intersection = (a, b) => {
     let outArr = [];
-    Set.addGenSetToGenSet(outArr, a);
-    Set.addGenSetToGenSet(outArr, b);
-    return Set.removeDuplicateItemsFromGenSet(outArr);
-};
-Set.intersection = (a, b) => {
-    let outArr = [];
-    Set.loopThroughElems(a, (elem) => {
-        if (Set.elemIsInSet(elem, b)) {
-            Set.addToGenSet(elem, outArr);
+    CSet.loopThroughElems(a, (elem) => {
+        if (CSet.elemIsInSet(elem, b)) {
+            CSet.addToGenSet(elem, outArr);
         }
     });
-    return new Set(outArr);
+    return new CSet(outArr);
 };
-Set.setDiff = (a, b) => {
+CSet.setDiff = (a, b) => {
     let outArr = [];
-    Set.loopThroughElems(a, (elem) => {
-        if (!Set.elemIsInSet(elem, b)) {
-            Set.addToGenSet(elem, outArr);
+    CSet.loopThroughElems(a, (elem) => {
+        if (!CSet.elemIsInSet(elem, b)) {
+            CSet.addToGenSet(elem, outArr);
         }
     });
-    return new Set(outArr);
+    return new CSet(outArr);
 };
-Set.cartesianProduct = (a, b) => {
+CSet.cartesianProduct = (a, b) => {
     let outArr = [];
-    Set.loopThroughElems(a, (elemA) => {
-        Set.loopThroughElems(b, (elemB) => {
-            Set.addToGenSet(outArr, [elemA, elemB]);
+    CSet.loopThroughElems(a, (elemA) => {
+        CSet.loopThroughElems(b, (elemB) => {
+            CSet.addToGenSet(outArr, [elemA, elemB]);
         });
     });
-    return new Set(outArr);
+    return new CSet(outArr);
 };
-Set.powerSet = (a) => {
-    let aSet = Set.getElemsIfSet(a);
+CSet.powerSet = (a) => {
+    let aSet = CSet.getElemsIfSet(a);
     let outArr = [];
-    for (let index = 0; index < 2 ** aSet.length; index++) {
+    for (let index = 0; index < Math.pow(2, aSet.length); index++) {
         let binaryString = index.toString(2);
         let binaryArr = binaryString.split("");
         binaryArr = padArr(binaryArr, aSet.length);
         let elemArr = [];
         binaryArr.forEach((e, i) => {
             if (e == "1")
-                Set.addToGenSet(elemArr, aSet[i]);
+                CSet.addToGenSet(elemArr, aSet[i]);
         });
-        Set.addToGenSet(outArr, elemArr);
+        CSet.addToGenSet(outArr, elemArr);
     }
-    return new Set(outArr);
+    return new CSet(outArr);
 };
-Set.symDiff = (a, b) => Set.setDiff(Set.union(a, b), Set.intersection(a, b));
+CSet.symDiff = (a, b) => CSet.setDiff(CSet.union(a, b), CSet.intersection(a, b));
 /**
  * @class
  * @classdesc Color Class
@@ -116,7 +112,7 @@ export class Color {
                 this.a = r.a;
             }
             else {
-                this.a = params.length == 1 ? 255 : params[1];
+                this.a = params.length === 1 ? 255 : params[1];
             }
         }
         else {
@@ -130,7 +126,7 @@ export class Color {
                 this.r = params[0];
                 this.g = params.length <= 2 ? params[0] : params[1];
                 this.b = params.length <= 2 ? params[0] : params[2];
-                this.a = params.length % 2 == 1 ? 255 : params.length == 2 ? params[1] : params[3];
+                this.a = params.length % 2 === 1 ? 255 : params.length == 2 ? params[1] : params[3];
             }
         }
     }
@@ -981,6 +977,11 @@ export class Button extends Box {
     }
 }
 Button.IsButton = (obj) => Box.IsBox(obj) && typeCheck(obj, "onClick");
+export const ImageFromSrc = (src) => {
+    let tempImg = new Image();
+    tempImg.src = src;
+    return tempImg;
+};
 /**
  * Helper Class for a playing card
  * @class
@@ -1003,15 +1004,15 @@ export class Card {
         this.suit = Card.SUITS[this.suitI];
         this.name = this.num + this.suit;
         this.sprite = new Image(1000, 1000);
-        this.sprite.src = "https://lightningund.github.io/Methlib/Images/" + this.suit + this.num + ".png";
+        this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
     }
 }
 Card.IsCard = (obj) => typeCheck(obj, "numI", "suitI", "num", "suit", "name", "flipped", "sprite");
 Card.SUITS = ['C', 'S', 'H', 'D'];
 Card.CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-Card.cardBack = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Back.png");
-Card.cardHighlight = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Highlight.png");
-Card.cardOutline = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Outline.png");
+Card.cardBack = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Back.png");
+Card.cardHighlight = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Highlight.png");
+Card.cardOutline = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Outline.png");
 Card.getVal = (card) => {
     switch (card.num) {
         case "A":
@@ -1193,16 +1194,16 @@ var tan = Math.tan;
  * @param defMax The default maximum
  * @returns an array of the min and max
  */
-function minAndMax(minMax, defMin, defMax) {
+const minAndMax = (minMax, defMin, defMax) => {
     let min = minMax.length > 1 ? minMax[0] : defMin;
     let max = minMax.length > 1 ? minMax[1] : minMax.length > 0 ? minMax[0] : defMax;
     return [min, max];
-}
-function cbCheck(cb, cond, ...params) {
+};
+const cbCheck = (cb, cond, ...params) => {
     if (cb !== undefined && cond)
         cb(params);
-}
-function posAndSize(obj, a, b, c, d) {
+};
+const posAndSize = (obj, a, b, c, d) => {
     if (a !== undefined) {
         if (Box.IsBox(a)) {
             obj.pos = a.pos;
@@ -1221,9 +1222,9 @@ function posAndSize(obj, a, b, c, d) {
         obj.pos = new Vector2(0, 0);
         obj.size = new Vector2(0, 0);
     }
-}
-function timeForm(val, measurement) { return val.toString() + measurement + (val > 1 ? "s" : ""); }
-export function padArr(inArr, targetLen, padStr) {
+};
+const timeForm = (val, measurement) => val.toString() + measurement + (val > 1 ? "s" : "");
+export const padArr = (inArr, targetLen, padStr) => {
     let padWith = padStr === undefined ? ["0"] : Array.from(padStr);
     for (let i = inArr.length; i < targetLen; i += padWith.length) {
         inArr.unshift(...padWith);
@@ -1232,12 +1233,7 @@ export function padArr(inArr, targetLen, padStr) {
         inArr.shift();
     }
     return inArr;
-}
-export function ImageFromSrc(src) {
-    let tempImg = new Image();
-    tempImg.src = src;
-    return tempImg;
-}
+};
 //#region Checkers
 //#region IntersectionChecks
 export class IntersectionBetween {
@@ -1375,21 +1371,20 @@ IntersectionBetween.NCubeAndNCube = (a, b) => {
  * @param props The properties of the object you want to check against
  * @returns whether the object is of specified type
  */
-export function typeCheck(objToCheck, ...props) {
+export const typeCheck = (objToCheck, ...props) => {
     for (let prop of props)
         try {
             if (!propertyCheck(objToCheck, prop))
                 return false;
         }
-        catch {
+        catch (_a) {
             return false;
         }
     return true;
-}
-export function propertyCheck(objToCheck, prop) { return prop in objToCheck; }
-;
+};
+export const propertyCheck = (objToCheck, prop) => prop in objToCheck;
 /** Brute force prime checker */
-export function isPrime(val) {
+export const isPrime = (val) => {
     for (let i = 2; i < Math.sqrt(val); i++) {
         if (isPrime(i)) {
             if (gcd(i, val) != 1) {
@@ -1398,20 +1393,20 @@ export function isPrime(val) {
         }
     }
     return true;
-}
+};
 /** Determines if two numbers are coprime to each other */
-export function areCoprime(a, b) { return gcd(a, b) == 1; }
+export const areCoprime = (a, b) => gcd(a, b) == 1;
 /** Check if a given value would be truncated with the given lower and upper limits */
-export function isLimited(limitee, ...minMaxIn) {
+export const isLimited = (limitee, ...minMaxIn) => {
     let minMax = minAndMax(minMaxIn, 0, 1);
     return (limitee <= minMax[0] || limitee >= minMax[1]);
-}
+};
 //#endregion
 //#region Math
 /** The logarithm of a number with an arbitrary base */
-export function logb(val, base) { return Math.log(val) / Math.log(base); }
+export const logb = (val, base) => Math.log(val) / Math.log(base);
 /** Return the greatest common denominator */
-export function gcd(a, b) {
+export const gcd = (a, b) => {
     while (true) {
         if (a > b) {
             a -= b;
@@ -1423,9 +1418,9 @@ export function gcd(a, b) {
             return a;
         }
     }
-}
+};
 /** Return the lowest common multiple */
-export function lcm(a, b) { return (a * b) / gcd(a, b); }
+export const lcm = (a, b) => (a * b) / gcd(a, b);
 /**
  * More efficient use of ^ and % together by using the modulus throughout the power-ing
  * @param b Base
@@ -1433,16 +1428,16 @@ export function lcm(a, b) { return (a * b) / gcd(a, b); }
  * @param m Modulus
  * @returns (b^e) % m
  */
-export function modPow(b, e, m) {
+export const modPow = (b, e, m) => {
     let modPow = 1;
     for (let i = 0; i < e; i++) {
         modPow *= b;
         modPow %= m;
     }
     return modPow;
-}
+};
 /** No Idea */
-export function eTot(val) {
+export const eTot = (val) => {
     let numCoprimes = 0;
     for (let i = 0; i < val; i++) {
         if (gcd(i, val) == 1) {
@@ -1450,10 +1445,10 @@ export function eTot(val) {
         }
     }
     return numCoprimes;
-}
+};
 //TODO:Figure out what the hell is happening with this and why it just doesn't work sometimes
 /** No Idea */
-export function carmichael(val) {
+export const carmichael = (val) => {
     let m = 0;
     let coprimes = findCoprimesLessThan(val);
     while (m < val * 10) {
@@ -1473,9 +1468,9 @@ export function carmichael(val) {
         }
     }
     return -1;
-}
+};
 /** No Idea */
-export function extendedEuclid(a, b) {
+export const extendedEuclid = (a, b) => {
     let s = 0;
     let old_s = 1;
     let t = 1;
@@ -1497,9 +1492,9 @@ export function extendedEuclid(a, b) {
         old_t = temp;
     }
     return old_s;
-}
+};
 /** Find all numbers that are less than n and are coprime to it */
-export function findCoprimesLessThan(n) {
+export const findCoprimesLessThan = (n) => {
     let coprimes = [];
     for (let i = 0; i < n; i++) {
         if (areCoprime(i, n)) {
@@ -1507,9 +1502,9 @@ export function findCoprimesLessThan(n) {
         }
     }
     return coprimes;
-}
+};
 /** Return an array of numbers coprime to n of length len */
-export function findCoprimeList(n, len) {
+export const findCoprimeList = (n, len) => {
     let coprimes = [];
     let checkNum = 1;
     while (coprimes.length < len) {
@@ -1519,20 +1514,20 @@ export function findCoprimeList(n, len) {
         checkNum++;
     }
     return coprimes;
-}
+};
 //#endregion
 //#region DoStuff
 /** Return a truncated version of a value between the lower and upper limits */
-export function limit(limitee, ...minMaxIn) {
+export const limit = (limitee, ...minMaxIn) => {
     let minMax = minAndMax(minMaxIn, 0, 1);
     if (limitee <= minMax[0])
         return minMax[0];
     if (limitee >= minMax[1])
         return minMax[1];
     return limitee;
-}
+};
 /** RSA encryption */
-export function RSAEncrypt(message, n, k) {
+export const RSAEncrypt = (message, n, k) => {
     let BEM = [];
     let CA = message.split("");
     for (let i in CA) {
@@ -1540,18 +1535,18 @@ export function RSAEncrypt(message, n, k) {
         BEM[i] = modPow(NC, k, n);
     }
     return BEM;
-}
+};
 /** RSA decryption */
-export function RSADecrypt(ENCMess, n, j) {
+export const RSADecrypt = (ENCMess, n, j) => {
     let message = "";
     for (let i of ENCMess) {
         let NC = modPow(i, j, n);
         message += NC.toString();
     }
     return message;
-}
+};
 /** Generate an MLA Citation */
-export function MLA_Citation(quote, act, scene, lineStart, lineEnd) {
+export const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
     let modQuote;
     if (lineEnd - lineStart < 2) {
         modQuote = quote;
@@ -1561,13 +1556,13 @@ export function MLA_Citation(quote, act, scene, lineStart, lineEnd) {
         modQuote = quoteWords[0] + " " + quoteWords[1] + " ... " + quoteWords[quoteWords.length - 2] + " " + quoteWords[quoteWords.length - 1];
     }
     return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
-}
+};
 /**
  * Formats a time from a number into something human-readable
  * @param time The time to format in seconds
  * @returns A formatted string with days, hours, minutes, and seconds
  */
-export function prettyTime(time) {
+export const prettyTime = (time) => {
     let seconds = time;
     let minutes = Math.floor(seconds / 60);
     let hours = Math.floor(minutes / 60);
@@ -1589,9 +1584,9 @@ export function prettyTime(time) {
         out_string.push(timeForm(seconds, " second"));
     }
     return out_string.join(", ");
-}
+};
 /** Generate the Roman numeral equivalent of a given number */
-export function romanNumerals(val) {
+export const romanNumerals = (val) => {
     let romanNum = "";
     let tenthPower = Math.ceil(logb(val, 10)) + 1;
     if (val > MRV)
@@ -1624,22 +1619,22 @@ export function romanNumerals(val) {
         romanNum += workingString;
     }
     return romanNum;
-}
+};
 /**
  * Remove a given value from the array
  * @param arr The array
  * @param val The value to be removed
  */
-export function removeFromArray(arr, val) {
+export const removeFromArray = (arr, val) => {
     let i = arr.indexOf(val);
     if (i != -1)
         arr.splice(i, 1);
     return arr;
-}
+};
 //#endregion
 //#region Random
 /** Randomize an array and return it (does not modify the input array) */
-export function randomize(inArr) {
+export const randomize = (inArr) => {
     let outArr = [];
     let numLoops = inArr.length;
     let indices = [];
@@ -1652,18 +1647,19 @@ export function randomize(inArr) {
         indices = removeFromArray(indices, index);
     }
     return outArr;
-}
+};
 /** Return a random value between the maximum and minimum value */
-export function random(...minMaxIn) {
+export const random = (...minMaxIn) => {
     let minMax = minAndMax(minMaxIn, 0, 1);
     return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
-}
+};
 /** Generate and return a random color */
-export function randomColor() {
+export const randomColor = () => {
     let r = Math.floor(random(255));
     let g = Math.floor(random(255));
     let b = Math.floor(random(255));
     return new Color(r, g, b);
-}
+};
 //#endregion
 //#endregion
+//# sourceMappingURL=methlib.js.map

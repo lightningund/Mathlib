@@ -1563,6 +1563,12 @@ export interface ICard {
 	sprite: HTMLImageElement;
 }
 
+export const ImageFromSrc = (src: string): HTMLImageElement => {
+	let tempImg = new Image();
+	tempImg.src = src;
+	return tempImg;
+}
+
 /**
  * Helper Class for a playing card
  * @class
@@ -1909,12 +1915,6 @@ export const padArr = (inArr: any[], targetLen: number, padStr?: string): any[] 
 		inArr.shift();
 	}
 	return inArr;
-}
-
-export const ImageFromSrc = (src: string): HTMLImageElement => {
-	let tempImg = new Image();
-	tempImg.src = src;
-	return tempImg;
 }
 
 //#region Checkers
