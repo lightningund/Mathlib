@@ -1,3 +1,4 @@
+
 //#region Classes
 //#region Set
 export interface ISet {
