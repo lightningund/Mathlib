@@ -7,20 +7,20 @@ export interface ISet {
 export type genSet = any[] | ISet;
 
 /**
- * Set (for set theory stuff I don't know I wanted to add this if you have a problem with it go write your own library)
+ * Set (for set theory stuff)
  * @class
  */
-export class Set implements ISet {
+export class CSet implements ISet {
 	static readonly IsSet = (obj: any): obj is ISet => typeCheck<ISet>(obj, "elems");
 
 	elems: any[];
 
 	constructor(arr?: genSet) {
-		this.elems = arr !== undefined ? Set.getElemsIfSet(arr) : [];
+		this.elems = arr !== undefined ? CSet.getElemsIfSet(arr) : [];
 	}
 
-	private static readonly createSetIfNot = (arr: genSet): ISet => Set.IsSet(arr) ? arr : { elems: arr as any[] };
-	private static readonly getElemsIfSet = (arr: genSet): any[] => Set.IsSet(arr) ? arr.elems : arr;
+	private static readonly createSetIfNot = (arr: genSet): ISet => CSet.IsSet(arr) ? arr : { elems: arr as any[] };
+	private static readonly getElemsIfSet = (arr: genSet): any[] => CSet.IsSet(arr) ? arr.elems : arr;
 
 	private static readonly loopThroughElems = (
 		inSet: genSet,
@@ -28,18 +28,15 @@ export class Set implements ISet {
 			elem: any
 		) => void
 	): void => {
-		let arr: any[] = Set.getElemsIfSet(inSet);
-		for (let i of arr) {
-			func(i);
-		}
+		CSet.getElemsIfSet(inSet).forEach(i => func(i));
 	}
 
 	private static readonly addGenSetToGenSet = (
-		arrA: genSet,
-		arrB: genSet
+		base: genSet,
+		toAdd: genSet
 	): void => {
-		Set.loopThroughElems(arrB, (elem: any) => {
-			Set.addToGenSet(arrA, elem);
+		CSet.loopThroughElems(toAdd, (elem: any) => {
+			CSet.addToGenSet(base, elem);
 		});
 	}
 
@@ -47,72 +44,70 @@ export class Set implements ISet {
 		arr: genSet,
 		elem: any
 	): void => {
-		Set.IsSet(arr) ? arr.elems.push(elem) : arr.push(elem);
+		CSet.IsSet(arr) ? arr.elems.push(elem) : arr.push(elem);
 	}
 
-	private static readonly removeDuplicateItemsFromGenSet = (arr: genSet): Set => {
+	private static readonly removeDuplicateItemsFromGenSet = (arr: genSet): CSet => {
 		let outArr: genSet = [];
-		Set.loopThroughElems(arr, (elem: any): void => {
-			if (!Set.elemIsInSet(elem, outArr)) {
-				Set.addToGenSet(elem, outArr);
+		CSet.loopThroughElems(arr, (elem: any): void => {
+			if (!CSet.elemIsInSet(elem, outArr)) {
+				CSet.addToGenSet(elem, outArr);
 			}
 		});
-		return new Set(outArr);
+		return new CSet(outArr);
 	}
 
 	private static readonly elemIsInSet = (setIn: genSet, elem: any): boolean => {
-		let elems: any[] = Set.createSetIfNot(setIn).elems;
-		return elems.indexOf(elem) != -1;
+		let elems: any[] = CSet.createSetIfNot(setIn).elems;
+		return elems.indexOf(elem) !== -1;
 	}
 
-	static readonly makeGenSetDense = (setIn: genSet): Set =>
-		new Set(Set.getElemsIfSet(setIn)
-			.filter(elem => elem != null)
-		);
+	static readonly makeGenSetDense = (setIn: genSet): CSet =>
+		new CSet(CSet.getElemsIfSet(setIn).filter(elem => elem !== null));
 
-	static readonly union = (a: genSet, b: genSet): Set => {
-		let outArr: genSet = [];
-		Set.addGenSetToGenSet(outArr, a);
-		Set.addGenSetToGenSet(outArr, b);
-		return Set.removeDuplicateItemsFromGenSet(outArr);
+	static readonly union = (a: genSet, b: genSet): CSet => {
+		const outArr: genSet = [];
+		CSet.addGenSetToGenSet(outArr, a);
+		CSet.addGenSetToGenSet(outArr, b);
+		return CSet.removeDuplicateItemsFromGenSet(outArr);
 	}
-	readonly union = (otherSet: genSet): Set => Set.union(this, otherSet);
+	readonly union = (otherSet: genSet): CSet => CSet.union(this, otherSet);
 
-	static readonly intersection = (a: genSet, b: genSet): Set => {
+	static readonly intersection = (a: genSet, b: genSet): CSet => {
 		let outArr: genSet = [];
-		Set.loopThroughElems(a, (elem: any): void => {
-			if (Set.elemIsInSet(elem, b)) {
-				Set.addToGenSet(elem, outArr);
+		CSet.loopThroughElems(a, (elem: any): void => {
+			if (CSet.elemIsInSet(elem, b)) {
+				CSet.addToGenSet(elem, outArr);
 			}
 		});
-		return new Set(outArr);
+		return new CSet(outArr);
 	}
-	readonly intersection = (otherSet: genSet): Set => Set.intersection(this, otherSet);
+	readonly intersection = (otherSet: genSet): CSet => CSet.intersection(this, otherSet);
 
-	static readonly setDiff = (a: genSet, b: genSet): Set => {
+	static readonly setDiff = (a: genSet, b: genSet): CSet => {
 		let outArr: genSet = [];
-		Set.loopThroughElems(a, (elem: any): void => {
-			if (!Set.elemIsInSet(elem, b)) {
-				Set.addToGenSet(elem, outArr);
+		CSet.loopThroughElems(a, (elem: any): void => {
+			if (!CSet.elemIsInSet(elem, b)) {
+				CSet.addToGenSet(elem, outArr);
 			}
 		});
-		return new Set(outArr);
+		return new CSet(outArr);
 	}
-	readonly setDiff = (otherSet: genSet): Set => Set.setDiff(this, otherSet);
+	readonly setDiff = (otherSet: genSet): CSet => CSet.setDiff(this, otherSet);
 
-	static readonly cartesianProduct = (a: genSet, b: genSet): Set => {
+	static readonly cartesianProduct = (a: genSet, b: genSet): CSet => {
 		let outArr: genSet = [];
-		Set.loopThroughElems(a, (elemA: any): void => {
-			Set.loopThroughElems(b, (elemB: any): void => {
-				Set.addToGenSet(outArr, [elemA, elemB]);
+		CSet.loopThroughElems(a, (elemA: any): void => {
+			CSet.loopThroughElems(b, (elemB: any): void => {
+				CSet.addToGenSet(outArr, [elemA, elemB]);
 			});
 		});
-		return new Set(outArr);
+		return new CSet(outArr);
 	}
-	readonly cartesianProduct = (otherSet: genSet): Set => Set.cartesianProduct(this, otherSet);
+	readonly cartesianProduct = (otherSet: genSet): CSet => CSet.cartesianProduct(this, otherSet);
 
-	static readonly powerSet = (a: genSet): Set => {
-		let aSet: any[] = Set.getElemsIfSet(a);
+	static readonly powerSet = (a: genSet): CSet => {
+		let aSet: any[] = CSet.getElemsIfSet(a);
 
 		let outArr: genSet = [];
 
@@ -123,17 +118,17 @@ export class Set implements ISet {
 
 			let elemArr: any[] = [];
 			binaryArr.forEach((e: string, i: number) => {
-				if (e == "1") Set.addToGenSet(elemArr, aSet[i]);
+				if (e == "1") CSet.addToGenSet(elemArr, aSet[i]);
 			})
-			Set.addToGenSet(outArr, elemArr)
+			CSet.addToGenSet(outArr, elemArr)
 		}
 
-		return new Set(outArr);
+		return new CSet(outArr);
 	}
-	readonly powerSet = (): Set => Set.powerSet(this);
+	readonly powerSet = (): CSet => CSet.powerSet(this);
 
-	static readonly symDiff = (a: genSet, b: genSet): Set => Set.setDiff(Set.union(a, b), Set.intersection(a, b));
-	readonly symDiff = (otherSet: genSet): Set => Set.symDiff(otherSet, this);
+	static readonly symDiff = (a: genSet, b: genSet): CSet => CSet.setDiff(CSet.union(a, b), CSet.intersection(a, b));
+	readonly symDiff = (otherSet: genSet): CSet => CSet.symDiff(otherSet, this);
 }
 //#endregion
 
@@ -213,7 +208,7 @@ export class Color implements RGBColor, HSVColor {
 			if (typeof r.a !== undefined) {
 				this.a = r.a;
 			} else {
-				this.a = params.length == 1 ? 255 : params[1];
+				this.a = params.length === 1 ? 255 : params[1];
 			}
 		} else {
 			if (params.length == 0) {
@@ -225,7 +220,7 @@ export class Color implements RGBColor, HSVColor {
 				this.r = params[0];
 				this.g = params.length <= 2 ? params[0] : params[1];
 				this.b = params.length <= 2 ? params[0] : params[2];
-				this.a = params.length % 2 == 1 ? 255 : params.length == 2 ? params[1] : params[3];
+				this.a = params.length % 2 === 1 ? 255 : params.length == 2 ? params[1] : params[3];
 			}
 		}
 	}
@@ -1857,31 +1852,31 @@ var tan = Math.tan;
  * @param defMax The default maximum
  * @returns an array of the min and max
  */
-function minAndMax(
+const minAndMax = (
 	minMax: any[],
 	defMin: any,
 	defMax: any
-): any[] {
+): any[] => {
 	let min: any = minMax.length > 1 ? minMax[0] : defMin;
 	let max: any = minMax.length > 1 ? minMax[1] : minMax.length > 0 ? minMax[0] : defMax;
 	return [min, max];
 }
 
-function cbCheck(
+const cbCheck = (
 	cb: (...par: any[]) => any,
 	cond: boolean,
 	...params: any[]
-): void {
+): void => {
 	if (cb !== undefined && cond) cb(params);
 }
 
-function posAndSize(
+const posAndSize = (
 	obj: TBox,
 	a?: number | IVector2 | TBox,
 	b?: number | IVector2,
 	c?: number | IVector2,
 	d?: number
-): void {
+): void => {
 	if (a !== undefined) {
 		if (Box.IsBox(a)) {
 			obj.pos = a.pos;
@@ -1903,12 +1898,9 @@ function posAndSize(
 	}
 }
 
-function timeForm(
-	val: number,
-	measurement: string
-): string { return val.toString() + measurement + (val > 1 ? "s" : ""); }
+const timeForm = (val: number, measurement: string): string => val.toString() + measurement + (val > 1 ? "s" : "");
 
-export function padArr(inArr: any[], targetLen: number, padStr?: string): any[] {
+export const padArr = (inArr: any[], targetLen: number, padStr?: string): any[] => {
 	let padWith: any[] = padStr === undefined ? ["0"] : Array.from(padStr);
 	for (let i = inArr.length; i < targetLen; i += padWith.length) {
 		inArr.unshift(...padWith);
@@ -1919,7 +1911,7 @@ export function padArr(inArr: any[], targetLen: number, padStr?: string): any[] 
 	return inArr;
 }
 
-export function ImageFromSrc(src: string): HTMLImageElement {
+export const ImageFromSrc = (src: string): HTMLImageElement => {
 	let tempImg = new Image();
 	tempImg.src = src;
 	return tempImg;
@@ -2085,7 +2077,7 @@ export class IntersectionBetween {
  * @param props The properties of the object you want to check against
  * @returns whether the object is of specified type
  */
-export function typeCheck<T>(objToCheck: any, ...props: Array<keyof T>): objToCheck is T {
+export const typeCheck = <T>(objToCheck: any, ...props: Array<keyof T>): objToCheck is T => {
 	for (let prop of props)
 		try {
 			if (!propertyCheck(objToCheck, prop))
@@ -2096,10 +2088,10 @@ export function typeCheck<T>(objToCheck: any, ...props: Array<keyof T>): objToCh
 	return true;
 }
 
-export function propertyCheck<T>(objToCheck: any, prop: keyof T): objToCheck is T { return prop in (objToCheck as T) };
+export const propertyCheck = <T>(objToCheck: any, prop: keyof T): objToCheck is T => prop in (objToCheck as T);
 
 /** Brute force prime checker */
-export function isPrime(val: number): boolean {
+export const isPrime = (val: number): boolean => {
 	for (let i: number = 2; i < Math.sqrt(val); i++) {
 		if (isPrime(i)) {
 			if (gcd(i, val) != 1) {
@@ -2111,10 +2103,10 @@ export function isPrime(val: number): boolean {
 }
 
 /** Determines if two numbers are coprime to each other */
-export function areCoprime(a: number, b: number): boolean { return gcd(a, b) == 1; }
+export const areCoprime = (a: number, b: number): boolean => gcd(a, b) == 1;
 
 /** Check if a given value would be truncated with the given lower and upper limits */
-export function isLimited(limitee: number, ...minMaxIn: number[]): boolean {
+export const isLimited = (limitee: number, ...minMaxIn: number[]): boolean => {
 	let minMax: number[] = minAndMax(minMaxIn, 0, 1);
 
 	return (limitee <= minMax[0] || limitee >= minMax[1]);
@@ -2123,10 +2115,10 @@ export function isLimited(limitee: number, ...minMaxIn: number[]): boolean {
 
 //#region Math
 /** The logarithm of a number with an arbitrary base */
-export function logb(val: number, base: number): number { return Math.log(val) / Math.log(base); }
+export const logb= (val: number, base: number): number => Math.log(val) / Math.log(base);
 
 /** Return the greatest common denominator */
-export function gcd(a: number, b: number): number {
+export const gcd = (a: number, b: number): number => {
 	while (true) {
 		if (a > b) {
 			a -= b;
@@ -2139,7 +2131,7 @@ export function gcd(a: number, b: number): number {
 }
 
 /** Return the lowest common multiple */
-export function lcm(a: number, b: number): number { return (a * b) / gcd(a, b); }
+export const lcm = (a: number, b: number): number =>(a * b) / gcd(a, b);
 
 /**
  * More efficient use of ^ and % together by using the modulus throughout the power-ing
@@ -2148,11 +2140,11 @@ export function lcm(a: number, b: number): number { return (a * b) / gcd(a, b); 
  * @param m Modulus
  * @returns (b^e) % m
  */
-export function modPow(
+export const modPow = (
 	b: number,
 	e: number,
 	m: number
-): number {
+): number => {
 	let modPow: number = 1;
 
 	for (let i = 0; i < e; i++) {
@@ -2164,7 +2156,7 @@ export function modPow(
 }
 
 /** No Idea */
-export function eTot(val: number): number {
+export const eTot = (val: number): number => {
 	let numCoprimes: number = 0;
 
 	for (let i = 0; i < val; i++) {
@@ -2178,7 +2170,7 @@ export function eTot(val: number): number {
 
 //TODO:Figure out what the hell is happening with this and why it just doesn't work sometimes
 /** No Idea */
-export function carmichael(val: number): number {
+export const carmichael = (val: number): number => {
 	let m: number = 0;
 	let coprimes: number[] = findCoprimesLessThan(val);
 	while (m < val * 10) {
@@ -2200,7 +2192,7 @@ export function carmichael(val: number): number {
 }
 
 /** No Idea */
-export function extendedEuclid(a: number, b: number): number {
+export const extendedEuclid = (a: number, b: number): number => {
 	let s = 0;
 	let old_s = 1;
 	let t = 1;
@@ -2228,7 +2220,7 @@ export function extendedEuclid(a: number, b: number): number {
 }
 
 /** Find all numbers that are less than n and are coprime to it */
-export function findCoprimesLessThan(n: number): number[] {
+export const findCoprimesLessThan = (n: number): number[] => {
 	let coprimes: number[] = [];
 
 	for (let i: number = 0; i < n; i++) {
@@ -2241,7 +2233,7 @@ export function findCoprimesLessThan(n: number): number[] {
 }
 
 /** Return an array of numbers coprime to n of length len */
-export function findCoprimeList(n: number, len: number): number[] {
+export const findCoprimeList = (n: number, len: number): number[] => {
 	let coprimes: number[] = [];
 	let checkNum: number = 1;
 
@@ -2258,7 +2250,7 @@ export function findCoprimeList(n: number, len: number): number[] {
 
 //#region DoStuff
 /** Return a truncated version of a value between the lower and upper limits */
-export function limit(limitee: number, ...minMaxIn: number[]): number {
+export const limit = (limitee: number, ...minMaxIn: number[]): number => {
 	let minMax: number[] = minAndMax(minMaxIn, 0, 1);
 
 	if (limitee <= minMax[0]) return minMax[0];
@@ -2267,11 +2259,11 @@ export function limit(limitee: number, ...minMaxIn: number[]): number {
 }
 
 /** RSA encryption */
-export function RSAEncrypt(
+export const RSAEncrypt = (
 	message: string,
 	n: number,
 	k: number
-): number[] {
+): number[] => {
 	let BEM: number[] = [];
 	let CA: string[] = message.split("");
 	for (let i in CA) {
@@ -2282,11 +2274,11 @@ export function RSAEncrypt(
 }
 
 /** RSA decryption */
-export function RSADecrypt(
+export const RSADecrypt = (
 	ENCMess: number[],
 	n: number,
 	j: number
-): string {
+): string => {
 	let message: string = "";
 	for (let i of ENCMess) {
 		let NC: number = modPow(i, j, n);
@@ -2296,13 +2288,13 @@ export function RSADecrypt(
 }
 
 /** Generate an MLA Citation */
-export function MLA_Citation(
+export const MLA_Citation = (
 	quote: string,
 	act: number,
 	scene: number,
 	lineStart: number,
 	lineEnd: number
-): string {
+): string => {
 	let modQuote: string;
 
 	if (lineEnd - lineStart < 2) {
@@ -2320,7 +2312,7 @@ export function MLA_Citation(
  * @param time The time to format in seconds
  * @returns A formatted string with days, hours, minutes, and seconds
  */
-export function prettyTime(time: number): string {
+export const prettyTime = (time: number): string => {
 	let seconds: number = time;
 	let minutes: number = Math.floor(seconds / 60);
 	let hours: number = Math.floor(minutes / 60);
@@ -2349,7 +2341,7 @@ export function prettyTime(time: number): string {
 }
 
 /** Generate the Roman numeral equivalent of a given number */
-export function romanNumerals(val: number): string {
+export const romanNumerals = (val: number): string => {
 	let romanNum: string = "";
 	let tenthPower: number = Math.ceil(logb(val, 10)) + 1;
 
@@ -2386,7 +2378,7 @@ export function romanNumerals(val: number): string {
  * @param arr The array
  * @param val The value to be removed
  */
-export function removeFromArray(arr: any[], val: any): any[] {
+export const removeFromArray = (arr: any[], val: any): any[] => {
 	let i: number = arr.indexOf(val);
 	if (i != -1) arr.splice(i, 1);
 	return arr;
@@ -2395,7 +2387,7 @@ export function removeFromArray(arr: any[], val: any): any[] {
 
 //#region Random
 /** Randomize an array and return it (does not modify the input array) */
-export function randomize(inArr: any[]): any[] {
+export const randomize = (inArr: any[]): any[] => {
 	let outArr: any = [];
 	let numLoops: number = inArr.length;
 	let indices: number[] = [];
@@ -2412,14 +2404,14 @@ export function randomize(inArr: any[]): any[] {
 }
 
 /** Return a random value between the maximum and minimum value */
-export function random(...minMaxIn: number[]): number {
+export const random = (...minMaxIn: number[]): number => {
 	let minMax: number[] = minAndMax(minMaxIn, 0, 1);
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
 }
 
 /** Generate and return a random color */
-export function randomColor(): Color {
+export const randomColor = (): Color => {
 	let r: number = Math.floor(random(255));
 	let g: number = Math.floor(random(255));
 	let b: number = Math.floor(random(255));
