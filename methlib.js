@@ -1,4 +1,22 @@
 /**
+ * Checks if a given object is of a given type
+ * @param objToCheck The object you want to check is of type
+ * @param props The properties of the object you want to check against
+ * @returns whether the object is of specified type
+ */
+export const typeCheck = (objToCheck, ...props) => {
+    for (let prop of props)
+        try {
+            if (!propertyCheck(objToCheck, prop))
+                return false;
+        }
+        catch {
+            return false;
+        }
+    return true;
+};
+export const propertyCheck = (objToCheck, prop) => prop in objToCheck;
+/**
  * Set (for set theory stuff)
  * @class
  */
@@ -1265,8 +1283,6 @@ IntersectionBetween.Point1DAndRange = (point, range) => point > range.start && p
 IntersectionBetween.RangeAndRange = (a, b) => (a.start + a.size >= b.start) && (b.start + b.size >= a.start);
 //point & point
 IntersectionBetween.Point2DAndPoint2D = (pointA, pointB) => pointA.x == pointB.x && pointA.y == pointB.y;
-//point & 3D point
-IntersectionBetween.Point2DAndPoint3D = (pointA, pointB) => IntersectionBetween.Point2DAndPoint2D(pointA, pointB) && pointB.z == 0;
 //point & line
 IntersectionBetween.Point2DAndLineInf2D = (point, line) => {
     let pointToSourceVec = Vector2.sub(line.source, point);
@@ -1281,8 +1297,6 @@ IntersectionBetween.Point2DAndLineSegment2D = (point, line) => {
     let withinBRange = pointToBVec.squareLength() < AToBVec.squareLength();
     return AToBVec.heading() == pointToAVec.heading() && withinARange && withinBRange;
 };
-//point & 3D line
-//point & 3D line segment
 //point & box
 IntersectionBetween.Point2DAndBox = (point, box) => {
     let xRange = new CRange(box.pos.x, box.size.x);
@@ -1290,20 +1304,13 @@ IntersectionBetween.Point2DAndBox = (point, box) => {
     return IntersectionBetween.Point1DAndRange(point.x, xRange) && IntersectionBetween.Point1DAndRange(point.y, yRange);
 };
 //point & circle
-//point & cube
-//point & sphere
-//3D point & line
-//3D point & line segment
+IntersectionBetween.Point2DAndCircle = (point, circle) => Vector2.dist(point, circle.center) <= circle.radius;
 //3D point & 3D line
 //3D point & 3D line segment
-//3D point & box
-//3D point & circle
 //3D point & cube
 //3D point & sphere
 //line & line
 //line & line segment
-//line & 3D line
-//line & 3D line segment
 //line & box
 IntersectionBetween.LineInf2DAndBox = (line, box) => {
     let boxCorners = [
@@ -1319,37 +1326,15 @@ IntersectionBetween.LineInf2DAndBox = (line, box) => {
     return line.angle < angleA && line.angle > angleB;
 };
 //line & circle
-//line & cube
-IntersectionBetween.LineInf2DAndCube = (line, cube) => {
-    let boxCorners = [
-        cube.pos,
-        Vector2.add(cube.pos, { x: cube.size.x, y: 0 }),
-        Vector2.add(cube.pos, { x: 0, y: cube.size.y }),
-        Vector2.add(cube.pos, cube.size)
-    ];
-    let pointToCornerLines = boxCorners.map(corner => new LineInf2D(line.source, corner));
-    let pointToCornerAngles = pointToCornerLines.map(PTCL => PTCL.angle);
-    let angleA = Math.max(...pointToCornerAngles);
-    let angleB = Math.min(...pointToCornerAngles);
-    return line.angle < angleA && line.angle > angleB;
-};
 //line & sphere
 //line segment & line segment
-//line segment & 3D line
-//line segment & 3D line segment
 //line segment & box
 //line segment & circle
-//line segment & cube
-//line segment & sphere
 //3D line & 3D line
 //3D line & 3D line segment
-//3D line & box
-//3D line & circle
 //3D line & cube
 //3D line & sphere
 //3D line segment & 3D line segment
-//3D line segment & box
-//3D line segment & circle
 //3D line segment & cube
 //3D line segment & sphere
 //box & box
@@ -1361,9 +1346,6 @@ IntersectionBetween.BoxAndBox = (a, b) => {
     return (IntersectionBetween.RangeAndRange(xa, xb) && IntersectionBetween.RangeAndRange(ya, yb));
 };
 //box & circle
-//box & cube
-//box & sphere
-//circle & circle
 //circle & cube
 //circle & sphere
 //cube & cube
@@ -1388,24 +1370,6 @@ IntersectionBetween.NCubeAndNCube = (a, b) => {
     return overlap;
 };
 //#endregion
-/**
- * Checks if a given object is of a given type
- * @param objToCheck The object you want to check is of type
- * @param props The properties of the object you want to check against
- * @returns whether the object is of specified type
- */
-export const typeCheck = (objToCheck, ...props) => {
-    for (let prop of props)
-        try {
-            if (!propertyCheck(objToCheck, prop))
-                return false;
-        }
-        catch {
-            return false;
-        }
-    return true;
-};
-export const propertyCheck = (objToCheck, prop) => prop in objToCheck;
 /** Brute force prime checker */
 export const isPrime = (val) => {
     for (let i = 2; i < Math.sqrt(val); i++) {
