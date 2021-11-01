@@ -1662,9 +1662,9 @@ export class Card implements ICard {
 	static readonly SUITS = ['C', 'S', 'H', 'D'];
 	static readonly CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-	static readonly cardBack: HTMLImageElement = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Back.png");
-	static readonly cardHighlight: HTMLImageElement = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Highlight.png");
-	static readonly cardOutline: HTMLImageElement = ImageFromSrc("https://javakid0826.github.io/Methlib-js/Images/Outline.png");
+	static readonly cardBack: HTMLImageElement = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Back.png");
+	static readonly cardHighlight: HTMLImageElement = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Highlight.png");
+	static readonly cardOutline: HTMLImageElement = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Outline.png");
 
 	numI: number;
 	suitI: number;
@@ -1691,7 +1691,7 @@ export class Card implements ICard {
 		this.name = this.num + this.suit;
 
 		this.sprite = new Image(1000, 1000);
-		this.sprite.src = "https://javakid0826.github.io/Methlib-js/Images/" + this.suit + this.num + ".png";
+		this.sprite.src = "https://lightningund.github.io/Methlib/Images/" + this.suit + this.num + ".png";
 	}
 
 	static readonly getVal = (card: ICard): number => {
