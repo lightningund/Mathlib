@@ -797,6 +797,27 @@ export class NCube {
 }
 NCube.IsNCube = (obj) => typeCheck(obj, "pos", "size");
 NCube.getCenter = (cube) => VectorN.add(cube.pos, VectorN.scale(cube.size, 1 / 2));
+export class Circle {
+    constructor(centerPos, rad) {
+        this.center = new Vector2(centerPos);
+        this.radius = rad;
+    }
+}
+Circle.IsCircle = (obj) => typeCheck(obj, "center", "radius");
+export class Sphere {
+    constructor(centerPos, rad) {
+        this.center = new Vector3(centerPos);
+        this.radius = rad;
+    }
+}
+Sphere.IsSphere = (obj) => typeCheck(obj, "center", "radius");
+export class NSphere {
+    constructor(centerPos, rad) {
+        this.center = new VectorN(centerPos);
+        this.radius = rad;
+    }
+}
+NSphere.IsNSphere = (obj) => typeCheck(obj, "center", "radius");
 /**
  * Helper class for a rectangular 2D collider
  * @class
@@ -1238,7 +1259,9 @@ export const padArr = (inArr, targetLen, padStr) => {
 //#region IntersectionChecks
 export class IntersectionBetween {
 }
+//point & range
 IntersectionBetween.Point1DAndRange = (point, range) => point > range.start && point < range.start + range.size;
+//range & range
 IntersectionBetween.RangeAndRange = (a, b) => (a.start + a.size >= b.start) && (b.start + b.size >= a.start);
 //point & point
 IntersectionBetween.Point2DAndPoint2D = (pointA, pointB) => pointA.x == pointB.x && pointA.y == pointB.y;
@@ -1260,7 +1283,7 @@ IntersectionBetween.Point2DAndLineSegment2D = (point, line) => {
 };
 //point & 3D line
 //point & 3D line segment
-//point & box (X)
+//point & box
 IntersectionBetween.Point2DAndBox = (point, box) => {
     let xRange = new CRange(box.pos.x, box.size.x);
     let yRange = new CRange(box.pos.y, box.size.y);
@@ -1273,7 +1296,7 @@ IntersectionBetween.Point2DAndBox = (point, box) => {
 //3D point & line segment
 //3D point & 3D line
 //3D point & 3D line segment
-//3D point & box (X)
+//3D point & box
 //3D point & circle
 //3D point & cube
 //3D point & sphere
@@ -1281,7 +1304,7 @@ IntersectionBetween.Point2DAndBox = (point, box) => {
 //line & line segment
 //line & 3D line
 //line & 3D line segment
-//line & box (X)
+//line & box
 IntersectionBetween.LineInf2DAndBox = (line, box) => {
     let boxCorners = [
         box.pos,
@@ -1296,7 +1319,7 @@ IntersectionBetween.LineInf2DAndBox = (line, box) => {
     return line.angle < angleA && line.angle > angleB;
 };
 //line & circle
-//line & cube (X)
+//line & cube
 IntersectionBetween.LineInf2DAndCube = (line, cube) => {
     let boxCorners = [
         cube.pos,
@@ -1329,7 +1352,7 @@ IntersectionBetween.LineInf2DAndCube = (line, cube) => {
 //3D line segment & circle
 //3D line segment & cube
 //3D line segment & sphere
-//box & box (X)
+//box & box
 IntersectionBetween.BoxAndBox = (a, b) => {
     let xa = new CRange(a.pos.x, a.size.x);
     let xb = new CRange(b.pos.x, b.size.x);
@@ -1343,7 +1366,7 @@ IntersectionBetween.BoxAndBox = (a, b) => {
 //circle & circle
 //circle & cube
 //circle & sphere
-//cube & cube (X)
+//cube & cube
 IntersectionBetween.CubeAndCube = (a, b) => {
     let xya = new Box(new Vector2(a.pos.x, a.pos.y), new Vector2(a.size.x, a.size.y));
     let xyb = new Box(new Vector2(b.pos.x, b.pos.y), new Vector2(b.size.x, b.size.y));

@@ -1194,6 +1194,70 @@ export class NCube implements INCube {
 }
 //#endregion
 
+//#region R O U N D
+
+//#region Circle
+export interface ICircle {
+	center: Vector2;
+	radius: number;
+}
+
+export type TCircle = ICircle;
+
+export class Circle implements ICircle {
+	static readonly IsCircle = (obj: any): obj is TCircle => typeCheck<TCircle>(obj, "center", "radius");
+	center: Vector2;
+	radius: number;
+
+	constructor(centerPos: TVector2, rad: number) {
+		this.center = new Vector2(centerPos);
+		this.radius = rad;
+	}
+}
+//#endregion
+
+//#region Sphere
+export interface ISphere {
+	center: Vector3;
+	radius: number;
+}
+
+export type TSphere = ISphere;
+
+export class Sphere implements ISphere {
+	static readonly IsSphere = (obj: any): obj is TSphere => typeCheck<TSphere>(obj, "center", "radius");
+	center: Vector3;
+	radius: number;
+
+	constructor(centerPos: TVector3, rad: number) {
+		this.center = new Vector3(centerPos);
+		this.radius = rad;
+	}
+}
+//#endregion
+
+//#region NSphere
+export interface INSphere {
+	center: VectorN;
+	radius: number;
+}
+
+export type TNSphere = INSphere;
+
+export class NSphere implements INSphere {
+	static readonly IsNSphere = (obj: any): obj is TNSphere => typeCheck<TNSphere>(obj, "center", "radius");
+	center: VectorN;
+	radius: number;
+
+	constructor(centerPos: TVectorN, rad: number) {
+		this.center = new VectorN(centerPos);
+		this.radius = rad;
+	}
+}
+//#endregion
+
+//#endregion
+
 //#region Collider
 //#region Collider2
 export interface ICollider2 extends IBox {
@@ -1920,7 +1984,9 @@ export const padArr = (inArr: any[], targetLen: number, padStr?: string): any[] 
 //#region Checkers
 //#region IntersectionChecks
 export class IntersectionBetween {
+	//point & range
 	static readonly Point1DAndRange = (point: number, range: TRange): boolean => point > range.start && point < range.start + range.size;
+	//range & range
 	static readonly RangeAndRange = (a: TRange, b: TRange): boolean => (a.start + a.size >= b.start) && (b.start + b.size >= a.start);
 
 	//point & point
@@ -1943,7 +2009,7 @@ export class IntersectionBetween {
 	}
 	//point & 3D line
 	//point & 3D line segment
-	//point & box (X)
+	//point & box
 	static readonly Point2DAndBox = (point: TVector2, box: TBox): boolean => {
 		let xRange: CRange = new CRange(box.pos.x, box.size.x);
 		let yRange: CRange = new CRange(box.pos.y, box.size.y);
@@ -1958,7 +2024,7 @@ export class IntersectionBetween {
 	//3D point & line segment
 	//3D point & 3D line
 	//3D point & 3D line segment
-	//3D point & box (X)
+	//3D point & box
 	//3D point & circle
 	//3D point & cube
 	//3D point & sphere
@@ -1967,7 +2033,7 @@ export class IntersectionBetween {
 	//line & line segment
 	//line & 3D line
 	//line & 3D line segment
-	//line & box (X)
+	//line & box
 	static readonly LineInf2DAndBox = (line: TLineInf2D, box: TBox) => {
 		let boxCorners: TVector2[] = [
 			box.pos,
@@ -1986,7 +2052,7 @@ export class IntersectionBetween {
 		return line.angle < angleA && line.angle > angleB;
 	}
 	//line & circle
-	//line & cube (X)
+	//line & cube
 	static readonly LineInf2DAndCube = (line: TLineInf2D, cube: TCube) => {
 		let boxCorners: TVector2[] = [
 			cube.pos,
@@ -2027,7 +2093,7 @@ export class IntersectionBetween {
 	//3D line segment & cube
 	//3D line segment & sphere
 
-	//box & box (X)
+	//box & box
 	static readonly BoxAndBox = (a: TBox, b: TBox): boolean => {
 		let xa: CRange = new CRange(a.pos.x, a.size.x);
 		let xb: CRange = new CRange(b.pos.x, b.size.x);
@@ -2044,7 +2110,7 @@ export class IntersectionBetween {
 	//circle & cube
 	//circle & sphere
 
-	//cube & cube (X)
+	//cube & cube
 	static readonly CubeAndCube = (a: TCube, b: TCube): boolean => {
 		let xya = new Box(new Vector2(a.pos.x, a.pos.y), new Vector2(a.size.x, a.size.y));
 		let xyb = new Box(new Vector2(b.pos.x, b.pos.y), new Vector2(b.size.x, b.size.y));
