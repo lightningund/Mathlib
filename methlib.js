@@ -1234,8 +1234,8 @@ const tan = Math.tan;
  * @returns an array of the min and max
  */
 const minAndMax = (minMax, defMin, defMax) => {
-    let min = minMax.length > 1 ? minMax[0] : defMin;
-    let max = minMax.length > 1 ? minMax[1] : minMax.length > 0 ? minMax[0] : defMax;
+    const min = minMax.length > 1 ? minMax[0] : defMin;
+    const max = minMax.length > 1 ? minMax[1] : minMax.length > 0 ? minMax[0] : defMax;
     return [min, max];
 };
 const cbCheck = (cb, cond, ...params) => {
@@ -1264,7 +1264,7 @@ const posAndSize = (obj, a, b, c, d) => {
 };
 const timeForm = (val, measurement) => val.toString() + measurement + (val > 1 ? "s" : "");
 export const padArr = (inArr, targetLen, padStr) => {
-    let padWith = padStr === undefined ? ["0"] : Array.from(padStr);
+    const padWith = padStr === undefined ? ["0"] : Array.from(padStr);
     for (let i = inArr.length; i < targetLen; i += padWith.length) {
         inArr.unshift(...padWith);
     }
@@ -1480,12 +1480,13 @@ IntersectionBetween.BoxNDAndBoxND = (a, b) => {
 //#endregion
 /** Brute force prime checker */
 export const isPrime = (val) => {
-    for (let i = 2; i < Math.sqrt(val); i++) {
-        if (isPrime(i)) {
-            if (gcd(i, val) != 1) {
-                return false;
-            }
-        }
+    if (val === 2 || val === 3)
+        return true;
+    if (!(val % 6 === 1 || val % 6 === 5))
+        return false;
+    for (let i = 5; i < Math.sqrt(val); i += 2) {
+        if (i % val == 0)
+            return false;
     }
     return true;
 };
@@ -1493,7 +1494,7 @@ export const isPrime = (val) => {
 export const areCoprime = (a, b) => gcd(a, b) == 1;
 /** Check if a given value would be truncated with the given lower and upper limits */
 export const isLimited = (limitee, ...minMaxIn) => {
-    let minMax = minAndMax(minMaxIn, 0, 1);
+    const minMax = minAndMax(minMaxIn, 0, 1);
     return (limitee <= minMax[0] || limitee >= minMax[1]);
 };
 //#endregion
@@ -1535,7 +1536,7 @@ export const modPow = (b, e, m) => {
 export const eTot = (val) => {
     let numCoprimes = 0;
     for (let i = 0; i < val; i++) {
-        if (gcd(i, val) == 1) {
+        if (gcd(i, val) === 1) {
             numCoprimes++;
         }
     }
@@ -1549,18 +1550,14 @@ export const carmichael = (val) => {
     while (m < val * 10) {
         m++;
         let success = true;
-        for (let a of coprimes) {
+        for (const a of coprimes) {
             if (Math.pow(a, m) % val != 1) {
                 success = false;
                 break;
             }
         }
-        if (!success) {
-            continue;
-        }
-        else {
+        if (success)
             return m;
-        }
     }
     return -1;
 };
@@ -1590,11 +1587,10 @@ export const extendedEuclid = (a, b) => {
 };
 /** Find all numbers that are less than n and are coprime to it */
 export const findCoprimesLessThan = (n) => {
-    let coprimes = [];
+    const coprimes = [];
     for (let i = 0; i < n; i++) {
-        if (areCoprime(i, n)) {
+        if (areCoprime(i, n))
             coprimes.push(i);
-        }
     }
     return coprimes;
 };
@@ -1614,7 +1610,7 @@ export const findCoprimeList = (n, len) => {
 //#region DoStuff
 /** Return a truncated version of a value between the lower and upper limits */
 export const limit = (limitee, ...minMaxIn) => {
-    let minMax = minAndMax(minMaxIn, 0, 1);
+    const minMax = minAndMax(minMaxIn, 0, 1);
     if (limitee <= minMax[0])
         return minMax[0];
     if (limitee >= minMax[1])
@@ -1623,10 +1619,10 @@ export const limit = (limitee, ...minMaxIn) => {
 };
 /** RSA encryption */
 export const RSAEncrypt = (message, n, k) => {
-    let BEM = [];
-    let CA = message.split("");
-    for (let i in CA) {
-        let NC = parseInt(CA[i]);
+    const BEM = [];
+    const CA = message.split("");
+    for (const i in CA) {
+        const NC = parseInt(CA[i]);
         BEM[i] = modPow(NC, k, n);
     }
     return BEM;
@@ -1634,8 +1630,8 @@ export const RSAEncrypt = (message, n, k) => {
 /** RSA decryption */
 export const RSADecrypt = (ENCMess, n, j) => {
     let message = "";
-    for (let i of ENCMess) {
-        let NC = modPow(i, j, n);
+    for (const i of ENCMess) {
+        const NC = modPow(i, j, n);
         message += NC.toString();
     }
     return message;
@@ -1647,10 +1643,10 @@ export const MLA_Citation = (quote, act, scene, lineStart, lineEnd) => {
         modQuote = quote;
     }
     else {
-        let quoteWords = quote.split(" ");
-        modQuote = quoteWords[0] + " " + quoteWords[1] + " ... " + quoteWords[quoteWords.length - 2] + " " + quoteWords[quoteWords.length - 1];
+        const quoteWords = quote.split(" ");
+        modQuote = `${quoteWords[0]} ${quoteWords[1]} ... ${quoteWords[quoteWords.length - 2]} ${quoteWords[quoteWords.length - 1]}`;
     }
-    return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
+    return `'${modQuote}' (${romanNumerals(act)}, ${scene}, ${lineStart}, ${lineEnd})`;
 };
 /**
  * Formats a time from a number into something human-readable
@@ -1665,7 +1661,7 @@ export const prettyTime = (time) => {
     seconds %= 60;
     minutes %= 60;
     hours %= 24;
-    let out_string = [];
+    const out_string = [];
     if (days > 0) {
         out_string.push(timeForm(days, " day"));
     }
@@ -1721,7 +1717,7 @@ export const romanNumerals = (val) => {
  * @param val The value to be removed
  */
 export const removeFromArray = (arr, val) => {
-    let i = arr.indexOf(val);
+    const i = arr.indexOf(val);
     if (i != -1)
         arr.splice(i, 1);
     return arr;
@@ -1730,8 +1726,8 @@ export const removeFromArray = (arr, val) => {
 //#region Random
 /** Randomize an array and return it (does not modify the input array) */
 export const randomize = (inArr) => {
-    let outArr = [];
-    let numLoops = inArr.length;
+    const outArr = [];
+    const numLoops = inArr.length;
     let indices = [];
     for (let i = 0; i < numLoops; i++) {
         indices[i] = i;
@@ -1745,14 +1741,14 @@ export const randomize = (inArr) => {
 };
 /** Return a random value between the maximum and minimum value */
 export const random = (...minMaxIn) => {
-    let minMax = minAndMax(minMaxIn, 0, 1);
+    const minMax = minAndMax(minMaxIn, 0, 1);
     return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
 };
 /** Generate and return a random color */
 export const randomColor = () => {
-    let r = Math.floor(random(255));
-    let g = Math.floor(random(255));
-    let b = Math.floor(random(255));
+    const r = Math.floor(random(255));
+    const g = Math.floor(random(255));
+    const b = Math.floor(random(255));
     return new Color(r, g, b);
 };
 //#endregion

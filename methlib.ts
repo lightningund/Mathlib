@@ -371,7 +371,7 @@ interface IVector2 {
 	y: number;
 }
 
-/** @typedef TVecto2 */
+/** @typedef TVector2 */
 export type TVector2 = IVector2;
 
 /**
@@ -658,7 +658,7 @@ export class Vector3 implements IVector3 {
 	private static readonly makeRotationMatrix = (rx: number, ry: number, rz: number): number[][] => [
 		[
 			cos(rz) * cos(ry),
-			cos(rz) * sin(ry) * sin(rx) - sin(rz) * cos(rx), 
+			cos(rz) * sin(ry) * sin(rx) - sin(rz) * cos(rx),
 			cos(rz) * sin(ry) * cos(rx) + sin(rz) * sin(rx)
 		],
 		[
@@ -1801,7 +1801,7 @@ export class Canvas {
 		this.ctxt.save();
 
 		this.ctxt.fillStyle = Color.getRGBAHex(col);
-		
+
 		this.ctxt.fillRect(0, 0, w, h);
 
 		this.ctxt.restore();
@@ -1943,13 +1943,13 @@ const tan = Math.tan;
  * @param defMax The default maximum
  * @returns an array of the min and max
  */
-const minAndMax = (
-	minMax: any[],
-	defMin: any,
-	defMax: any
-): any[] => {
-	let min: any = minMax.length > 1 ? minMax[0] : defMin;
-	let max: any = minMax.length > 1 ? minMax[1] : minMax.length > 0 ? minMax[0] : defMax;
+const minAndMax = <T>(
+	minMax: T[],
+	defMin: T,
+	defMax: T
+): T[] => {
+	const min: T = minMax.length > 1 ? minMax[0] : defMin;
+	const max: T = minMax.length > 1 ? minMax[1] : minMax.length > 0 ? minMax[0] : defMax;
 	return [min, max];
 }
 
@@ -1963,9 +1963,9 @@ const cbCheck = (
 
 const posAndSize = (
 	obj: TBox2D,
-	a?: number | IVector2 | TBox2D,
-	b?: number | IVector2,
-	c?: number | IVector2,
+	a?: number | TVector2 | TBox2D,
+	b?: number | TVector2,
+	c?: number | TVector2,
 	d?: number
 ): void => {
 	if (a !== undefined) {
@@ -1973,14 +1973,14 @@ const posAndSize = (
 			obj.pos = a.pos;
 			obj.size = a.size;
 		} else if (Vector2.IsVector2(a)) {
-			obj.pos = Vector2.copy(a as IVector2);
+			obj.pos = Vector2.copy(a as TVector2);
 			obj.size = new Vector2(...(
-				Vector2.IsVector2(b) ? [b as IVector2] : [b as number, c as number]
+				Vector2.IsVector2(b) ? [b as TVector2] : [b as number, c as number]
 			));
 		} else {
 			obj.pos = new Vector2(a as number, b as number);
 			obj.size = new Vector2(...(
-				Vector2.IsVector2(c) ? [c as IVector2] : [c as number, d as number]
+				Vector2.IsVector2(c) ? [c as TVector2] : [c as number, d as number]
 			));
 		}
 	} else {
@@ -1992,13 +1992,16 @@ const posAndSize = (
 const timeForm = (val: number, measurement: string): string => val.toString() + measurement + (val > 1 ? "s" : "");
 
 export const padArr = (inArr: any[], targetLen: number, padStr?: string): any[] => {
-	let padWith: any[] = padStr === undefined ? ["0"] : Array.from(padStr);
+	const padWith: any[] = padStr === undefined ? ["0"] : Array.from(padStr);
+
 	for (let i = inArr.length; i < targetLen; i += padWith.length) {
 		inArr.unshift(...padWith);
 	}
-	for (let i = inArr.length; i > targetLen; i--) {
+
+	for (let i = inArr.length; i > targetLen; i --) {
 		inArr.shift();
 	}
+
 	return inArr;
 }
 
@@ -2126,7 +2129,7 @@ export class IntersectionBetween {
 	static readonly Box2DAndCircle = (Box2D: TBox2D, circle: TCircle): boolean => {
 		const x: number = limit(circle.center.x, Box2D.pos.x, Box2D.pos.x + Box2D.size.x);
 		const y: number = limit(circle.center.y, Box2D.pos.y, Box2D.pos.y + Box2D.size.y);
-	  
+
 		return Vector2.dist(new Vector2(x, y), circle.center) < circle.radius;
 	}
 
@@ -2149,6 +2152,7 @@ export class IntersectionBetween {
 		const yOverlap: boolean = IntersectionBetween.Point1DAndRange(point.y, yRange);
 		const zRange: CRange = new CRange(Box3D.pos.z, Box3D.size.z);
 		const zOverlap: boolean = IntersectionBetween.Point1DAndRange(point.z, zRange);
+
 		return xOverlap && yOverlap && zOverlap;
 	}
 	//Point3D & sphere
@@ -2222,7 +2226,7 @@ export class IntersectionBetween {
 		const x: number = limit(sphere.center.x, Box3D.pos.x, Box3D.pos.x + Box3D.size.x);
 		const y: number = limit(sphere.center.y, Box3D.pos.y, Box3D.pos.y + Box3D.size.y);
 		const z: number = limit(sphere.center.z, Box3D.pos.z, Box3D.pos.z + Box3D.size.z);
-	  
+
 		return Vector3.dist(new Vector3(x, y, z), sphere.center) < sphere.radius;
 	}
 
@@ -2243,7 +2247,7 @@ export class IntersectionBetween {
 		const bRanges: CRange[] = b.pos.coords.map((elem, ind) => new CRange(elem, b.size.coords[ind]));
 
 		let overlap: boolean = true;
-		aRanges.forEach((elem, ind) => {if(!IntersectionBetween.RangeAndRange(elem, bRanges[ind])) overlap = false;});
+		aRanges.forEach((elem, ind) => { if(!IntersectionBetween.RangeAndRange(elem, bRanges[ind])) overlap = false; });
 		return overlap;
 	}
 	//Box3DND & SphereND
@@ -2254,13 +2258,13 @@ export class IntersectionBetween {
 
 /** Brute force prime checker */
 export const isPrime = (val: number): boolean => {
-	for (let i: number = 2; i < Math.sqrt(val); i++) {
-		if (isPrime(i)) {
-			if (gcd(i, val) != 1) {
-				return false;
-			}
-		}
+	if(val === 2 || val === 3) return true;
+	if(!(val % 6 === 1 || val % 6 === 5)) return false;
+
+	for (let i = 5; i < Math.sqrt(val); i += 2) {
+		if (i % val == 0) return false;
 	}
+
 	return true;
 }
 
@@ -2269,7 +2273,7 @@ export const areCoprime = (a: number, b: number): boolean => gcd(a, b) == 1;
 
 /** Check if a given value would be truncated with the given lower and upper limits */
 export const isLimited = (limitee: number, ...minMaxIn: number[]): boolean => {
-	let minMax: number[] = minAndMax(minMaxIn, 0, 1);
+	const minMax: number[] = minAndMax(minMaxIn, 0, 1);
 
 	return (limitee <= minMax[0] || limitee >= minMax[1]);
 }
@@ -2293,7 +2297,7 @@ export const gcd = (a: number, b: number): number => {
 }
 
 /** Return the lowest common multiple */
-export const lcm = (a: number, b: number): number =>(a * b) / gcd(a, b);
+export const lcm = (a: number, b: number): number => (a * b) / gcd(a, b);
 
 /**
  * More efficient use of ^ and % together by using the modulus throughout the power-ing
@@ -2309,7 +2313,7 @@ export const modPow = (
 ): number => {
 	let modPow: number = 1;
 
-	for (let i = 0; i < e; i++) {
+	for (let i = 0; i < e; i ++) {
 		modPow *= b;
 		modPow %= m;
 	}
@@ -2321,9 +2325,9 @@ export const modPow = (
 export const eTot = (val: number): number => {
 	let numCoprimes: number = 0;
 
-	for (let i = 0; i < val; i++) {
-		if (gcd(i, val) == 1) {
-			numCoprimes++;
+	for (let i = 0; i < val; i ++) {
+		if (gcd(i, val) === 1) {
+			numCoprimes ++;
 		}
 	}
 
@@ -2336,20 +2340,18 @@ export const carmichael = (val: number): number => {
 	let m: number = 0;
 	let coprimes: number[] = findCoprimesLessThan(val);
 	while (m < val * 10) {
-		m++;
+		m ++;
 		let success: boolean = true;
-		for (let a of coprimes) {
+		for (const a of coprimes) {
 			if (Math.pow(a, m) % val != 1) {
 				success = false;
 				break;
 			}
 		}
-		if (!success) {
-			continue;
-		} else {
-			return m;
-		}
+
+		if (success) return m;
 	}
+
 	return -1;
 }
 
@@ -2383,12 +2385,10 @@ export const extendedEuclid = (a: number, b: number): number => {
 
 /** Find all numbers that are less than n and are coprime to it */
 export const findCoprimesLessThan = (n: number): number[] => {
-	let coprimes: number[] = [];
+	const coprimes: number[] = [];
 
-	for (let i: number = 0; i < n; i++) {
-		if (areCoprime(i, n)) {
-			coprimes.push(i);
-		}
+	for (let i: number = 0; i < n; i ++) {
+		if (areCoprime(i, n)) coprimes.push(i);
 	}
 
 	return coprimes;
@@ -2403,7 +2403,7 @@ export const findCoprimeList = (n: number, len: number): number[] => {
 		if (areCoprime(checkNum, n)) {
 			coprimes.push(checkNum);
 		}
-		checkNum++;
+		checkNum ++;
 	}
 
 	return coprimes;
@@ -2413,7 +2413,7 @@ export const findCoprimeList = (n: number, len: number): number[] => {
 //#region DoStuff
 /** Return a truncated version of a value between the lower and upper limits */
 export const limit = (limitee: number, ...minMaxIn: number[]): number => {
-	let minMax: number[] = minAndMax(minMaxIn, 0, 1);
+	const minMax: number[] = minAndMax(minMaxIn, 0, 1);
 
 	if (limitee <= minMax[0]) return minMax[0];
 	if (limitee >= minMax[1]) return minMax[1];
@@ -2426,12 +2426,13 @@ export const RSAEncrypt = (
 	n: number,
 	k: number
 ): number[] => {
-	let BEM: number[] = [];
-	let CA: string[] = message.split("");
-	for (let i in CA) {
-		let NC: number = parseInt(CA[i]);
+	const BEM: number[] = [];
+	const CA: string[] = message.split("");
+	for (const i in CA) {
+		const NC: number = parseInt(CA[i]);
 		BEM[i] = modPow(NC, k, n);
 	}
+
 	return BEM;
 }
 
@@ -2442,10 +2443,11 @@ export const RSADecrypt = (
 	j: number
 ): string => {
 	let message: string = "";
-	for (let i of ENCMess) {
-		let NC: number = modPow(i, j, n);
+	for (const i of ENCMess) {
+		const NC: number = modPow(i, j, n);
 		message += NC.toString();
 	}
+
 	return message;
 }
 
@@ -2462,11 +2464,11 @@ export const MLA_Citation = (
 	if (lineEnd - lineStart < 2) {
 		modQuote = quote;
 	} else {
-		let quoteWords: string[] = quote.split(" ");
-		modQuote = quoteWords[0] + " " + quoteWords[1] + " ... " + quoteWords[quoteWords.length - 2] + " " + quoteWords[quoteWords.length - 1];
+		const quoteWords: string[] = quote.split(" ");
+		modQuote = `${quoteWords[0]} ${quoteWords[1]} ... ${quoteWords[quoteWords.length - 2]} ${quoteWords[quoteWords.length - 1]}`;
 	}
 
-	return "'" + modQuote + "' (" + romanNumerals(act) + ", " + scene + ", " + lineStart + "-" + lineEnd + ")";
+	return `'${modQuote}' (${romanNumerals(act)}, ${scene}, ${lineStart}, ${lineEnd})`;
 }
 
 /**
@@ -2484,7 +2486,7 @@ export const prettyTime = (time: number): string => {
 	minutes %= 60;
 	hours %= 24;
 
-	let out_string: string[] = [];
+	const out_string: string[] = [];
 
 	if (days > 0) {
 		out_string.push(timeForm(days, " day"));
@@ -2541,7 +2543,7 @@ export const romanNumerals = (val: number): string => {
  * @param val The value to be removed
  */
 export const removeFromArray = (arr: any[], val: any): any[] => {
-	let i: number = arr.indexOf(val);
+	const i: number = arr.indexOf(val);
 	if (i != -1) arr.splice(i, 1);
 	return arr;
 }
@@ -2550,8 +2552,8 @@ export const removeFromArray = (arr: any[], val: any): any[] => {
 //#region Random
 /** Randomize an array and return it (does not modify the input array) */
 export const randomize = (inArr: any[]): any[] => {
-	let outArr: any = [];
-	let numLoops: number = inArr.length;
+	const outArr: any = [];
+	const numLoops: number = inArr.length;
 	let indices: number[] = [];
 	for (let i: number = 0; i < numLoops; i++) {
 		indices[i] = i;
@@ -2567,16 +2569,16 @@ export const randomize = (inArr: any[]): any[] => {
 
 /** Return a random value between the maximum and minimum value */
 export const random = (...minMaxIn: number[]): number => {
-	let minMax: number[] = minAndMax(minMaxIn, 0, 1);
+	const minMax: number[] = minAndMax(minMaxIn, 0, 1);
 
 	return (Math.random() * (minMax[1] - minMax[0])) + minMax[0];
 }
 
 /** Generate and return a random color */
 export const randomColor = (): Color => {
-	let r: number = Math.floor(random(255));
-	let g: number = Math.floor(random(255));
-	let b: number = Math.floor(random(255));
+	const r: number = Math.floor(random(255));
+	const g: number = Math.floor(random(255));
+	const b: number = Math.floor(random(255));
 
 	return new Color(r, g, b);
 }
