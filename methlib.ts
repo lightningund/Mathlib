@@ -735,7 +735,7 @@ export class Vector3 implements IVector3 {
 	};
 
 	/**
-	 * Limit a vector to a cube defined by the lower and upper limits forming the corners
+	 * Limit a vector to a Box3D defined by the lower and upper limits forming the corners
 	 */
 	static readonly limit = (limitee: TVector3, ...minMaxIn: TVector3[]): Vector3 => {
 		let minMax = minAndMax(minMaxIn, new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
@@ -905,7 +905,7 @@ export class VectorN implements IVectorN {
 	};
 
 	/**
-	 * Limit a vector to a cube defined by the lower and upper limits forming the corners
+	 * Limit a vector to a Box3D defined by the lower and upper limits forming the corners
 	 */
 	static readonly limit = (limitee: TVectorN, ...minMaxIn: TVectorN[]): VectorN => {
 		let minMax = minAndMax(minMaxIn, VectorN.setAll(limitee, -1), VectorN.setAll(limitee, 1));
@@ -1064,78 +1064,79 @@ export class CRange implements IRange {
 //#endregion
 
 //#region Box
-export interface IBox {
+//#region Box2D
+export interface IBox2D {
 	pos: Vector2;
 	size: Vector2;
 }
 
-export type TBox = IBox;
+export type TBox2D = IBox2D;
 
 /**
  * General 2d rectangle
  * @class
  */
-export class Box implements IBox {
-	static readonly IsBox = (obj: any): obj is TBox => typeCheck<TBox>(obj, "pos", "size");
+export class Box2D implements IBox2D {
+	static readonly IsBox2D = (obj: any): obj is TBox2D => typeCheck<TBox2D>(obj, "pos", "size");
 
 	pos: Vector2;
 	size: Vector2;
 
 	//#region Construcors
 	/**
-	 * Create a general Box with default position and default size
+	 * Create a general Box2D with default position and default size
 	 * @constructor
 	 */
 	constructor();
 	/**
-	 * Create a Box from a position Vector and default size
+	 * Create a Box2D from a position Vector and default size
 	 * @constructor
 	 * @param pos TVector2 representing the position
 	 */
 	constructor(pos: TVector2);
 	/**
-	 * Create a Box from a position Vector and default size
+	 * Create a Box2D from a position Vector and default size
 	 * @constructor
-	 * @param posX number representing the x coordinate of the Box
-	 * @param posY number representing the y coordinate of the Box
+	 * @param posX number representing the x coordinate of the Box2D
+	 * @param posY number representing the y coordinate of the Box2D
 	 */
 	constructor(posX: number, posY: number);
 	/**
-	 * Create a Box from another TBox object
+	 * Create a Box2D from another TBox2D object
 	 * @constructor
-	 * @param box The TBox used as a reference
+	 * @param Box2D The TBox2D used as a reference
 	 */
-	constructor(box: TBox);
+	constructor(Box2D: TBox2D);
 	/**
-	 * Create a Box from a position Vector and a size Vector
+	 * Create a Box2D from a position Vector and a size Vector
 	 * @constructor
 	 * @param pos TVector2 representing the position
 	 * @param size TVector2 representing the width and height
 	 */
 	constructor(pos: TVector2, size: TVector2);
 	/**
-	 * Create a Box from a position Vector and explicit width and height values
+	 * Create a Box2D from a position Vector and explicit width and height values
 	 * @constructor
 	 * @param pos TVector2 representing the position
-	 * @param width number representing the width of the Box
-	 * @param height number representing the height of the Box
+	 * @param width number representing the width of the Box2D
+	 * @param height number representing the height of the Box2D
 	 */
 	constructor(pos: TVector2, width: number, height: number);
 	/**
-	 * Create a Box from a explicit x and y values and a size Vector
+	 * Create a Box2D from a explicit x and y values and a size Vector
 	 * @constructor
-	 * @param posX number representing the x coordinate of the Box
-	 * @param posY number representing the y coordinate of the Box
+	 * @param posX number representing the x coordinate of the Box2D
+	 * @param posY number representing the y coordinate of the Box2D
 	 * @param size TVector2 representing the width and height
 	 */
 	constructor(posX: number, posY: number, size: TVector2);
 	/**
-	 * Create a Box from a explicit x and y values and explicit width and height values
+	 * Create a Box2D from a explicit x and y values and explicit width and height values
 	 * @constructor
-	 * @param posX number representing the x coordinate of the Box
-	 * @param posY number representing the y coordinate of the Box
-	 * @param width number representing the width of the Box
-	 * @param height number representing the height of the Box
+	 * @param posX number representing the x coordinate of the Box2D
+	 * @param posY number representing the y coordinate of the Box2D
+	 * @param width number representing the width of the Box2D
+	 * @param height number representing the height of the Box2D
 	 */
 	constructor(posX: number, posY: number, width: number, height: number);
 	//#endregion
@@ -1148,8 +1149,8 @@ export class Box implements IBox {
 		posAndSize(this, a, b, c, d);
 	}
 
-	static readonly getCenter = (box: IBox): TVector2 => Vector2.add(box.pos, Vector2.scale(box.size, 1 / 2));
-	readonly getCenter = (): TVector2 => Box.getCenter(this);
+	static readonly getCenter = (Box2D: IBox2D): TVector2 => Vector2.add(Box2D.pos, Vector2.scale(Box2D.size, 1 / 2));
+	readonly getCenter = (): TVector2 => Box2D.getCenter(this);
 
 	readonly render = (context: Canvas): void => {
 		context.rect(this.pos.x, this.pos.y, this.size.x, this.size.y);
@@ -1157,20 +1158,20 @@ export class Box implements IBox {
 }
 //#endregion
 
-//#region Cube
-export interface ICube {
+//#region Box3D
+export interface IBox3D {
 	pos: Vector3;
 	size: Vector3;
 }
 
-export type TCube = ICube;
+export type TBox3D = IBox3D;
 
 /**
  * General 3d cuboid
  * @class
  */
-export class Cube implements ICube {
-	static readonly IsCube = (obj: any): obj is TCube => typeCheck<TCube>(obj, "pos", "size");
+export class Box3D implements IBox3D {
+	static readonly IsBox3D = (obj: any): obj is TBox3D => typeCheck<TBox3D>(obj, "pos", "size");
 
 	pos: Vector3;
 	size: Vector3;
@@ -1180,25 +1181,25 @@ export class Cube implements ICube {
 		this.size = new Vector3(size);
 	}
 
-	static readonly getCenter = (cube: TCube): TVector3 => Vector3.add(cube.pos, Vector3.scale(cube.size, 1 / 2));
-	readonly getCenter = (): TVector3 => Cube.getCenter(this);
+	static readonly getCenter = (Box3D: TBox3D): TVector3 => Vector3.add(Box3D.pos, Vector3.scale(Box3D.size, 1 / 2));
+	readonly getCenter = (): TVector3 => Box3D.getCenter(this);
 }
 //#endregion
 
-//#region NCube
-export interface INCube {
+//#region BoxND
+export interface IBoxND {
 	pos: VectorN;
 	size: VectorN;
 }
 
-export type TNCube = INCube;
+export type TBoxND = IBoxND;
 
 /**
  * General 3d cuboid
  * @class
  */
-export class NCube implements INCube {
-	static readonly IsNCube = (obj: any): obj is TNCube => typeCheck<TNCube>(obj, "pos", "size");
+export class BoxND implements IBoxND {
+	static readonly IsBoxND = (obj: any): obj is TBoxND => typeCheck<TBoxND>(obj, "pos", "size");
 
 	pos: VectorN;
 	size: VectorN;
@@ -1208,9 +1209,10 @@ export class NCube implements INCube {
 		this.size = new VectorN(size);
 	}
 
-	static readonly getCenter = (cube: TNCube): TVectorN => VectorN.add(cube.pos, VectorN.scale(cube.size, 1 / 2));
-	readonly getCenter = (): TVectorN => NCube.getCenter(this);
+	static readonly getCenter = (Box3D: TBoxND): TVectorN => VectorN.add(Box3D.pos, VectorN.scale(Box3D.size, 1 / 2));
+	readonly getCenter = (): TVectorN => BoxND.getCenter(this);
 }
+//#endregion
 //#endregion
 
 //#region R O U N D
@@ -1279,7 +1281,7 @@ export class NSphere implements INSphere {
 
 //#region Collider
 //#region Collider2
-export interface ICollider2 extends IBox {
+export interface ICollider2 extends IBox2D {
 	vel: Vector2;
 	acc: Vector2;
 }
@@ -1290,8 +1292,8 @@ export type TCollider2 = ICollider2;
  * Helper class for a rectangular 2D collider
  * @class
  */
-export class Collider2 extends Box implements ICollider2 {
-	static readonly IsCollider2 = (obj: any): obj is TCollider2 => Box.IsBox(obj) && typeCheck<TCollider2>(obj, "vel", "acc");
+export class Collider2 extends Box2D implements ICollider2 {
+	static readonly IsCollider2 = (obj: any): obj is TCollider2 => Box2D.IsBox2D(obj) && typeCheck<TCollider2>(obj, "vel", "acc");
 
 	vel: Vector2;
 	acc: Vector2;
@@ -1315,11 +1317,11 @@ export class Collider2 extends Box implements ICollider2 {
 	 */
 	constructor(posX: number, posY: number);
 	/**
-	 * Create a Collider from another TBox object
+	 * Create a Collider from another TBox2D object
 	 * @constructor
-	 * @param box The TBox used as a reference
+	 * @param Box2D The TBox2D used as a reference
 	 */
-	constructor(box: TBox);
+	constructor(Box2D: TBox2D);
 	/**
 	 * Create a Collider from a position Vector and a size Vector
 	 * @constructor
@@ -1387,13 +1389,13 @@ export class Collider2 extends Box implements ICollider2 {
 
 		for (let col of colliders) {
 			if (col === this) continue;
-			if (IntersectionBetween.BoxAndBox(col, nextColY)) {
+			if (IntersectionBetween.Box2DAndBox2D(col, nextColY)) {
 				if (this.vel.y > 0) cbCheck(callbacks.ypos, true, col);
 				else cbCheck(callbacks.yneg, true, col);
 				cbCheck(callbacks.yany, true, col);
 				hit = true;
 			}
-			if (IntersectionBetween.BoxAndBox(col, nextColX)) {
+			if (IntersectionBetween.Box2DAndBox2D(col, nextColX)) {
 				if (this.vel.x > 0) cbCheck(callbacks.xpos, true, col);
 				else cbCheck(callbacks.xneg, true, col);
 				cbCheck(callbacks.xany, true, col);
@@ -1434,7 +1436,7 @@ export class Collider2 extends Box implements ICollider2 {
 //#endregion
 
 //#region Collider3
-export interface ICollider3 extends ICube {
+export interface ICollider3 extends IBox3D {
 	vel: Vector3;
 	acc: Vector3;
 }
@@ -1445,8 +1447,8 @@ export type TCollider3 = ICollider3;
  * Helper class for a cuboid 3D collider
  * @class
  */
-export class Collider3 extends Cube implements ICollider3 {
-	static readonly IsCollider3 = (obj: any): obj is TCollider3 => Box.IsBox(obj) && typeCheck<TCollider3>(obj, "vel", "acc");
+export class Collider3 extends Box3D implements ICollider3 {
+	static readonly IsCollider3 = (obj: any): obj is TCollider3 => Box2D.IsBox2D(obj) && typeCheck<TCollider3>(obj, "vel", "acc");
 
 	vel: Vector3;
 	acc: Vector3;
@@ -1482,17 +1484,17 @@ export class Collider3 extends Cube implements ICollider3 {
 
 		for (let col of colliders) {
 			if (col == this) continue;
-			if (IntersectionBetween.CubeAndCube(col, nextColX)) {
+			if (IntersectionBetween.Box3DAndBox3D(col, nextColX)) {
 				if (this.vel.x > 0) cbCheck(callbacks.xpos, true, col);
 				else cbCheck(callbacks.xneg, true, col);
 				hit = true;
 			}
-			if (IntersectionBetween.CubeAndCube(col, nextColY)) {
+			if (IntersectionBetween.Box3DAndBox3D(col, nextColY)) {
 				if (this.vel.y > 0) cbCheck(callbacks.ypos, true, col);
 				else cbCheck(callbacks.yneg, true, col);
 				hit = true;
 			}
-			if (IntersectionBetween.CubeAndCube(col, nextColZ)) {
+			if (IntersectionBetween.Box3DAndBox3D(col, nextColZ)) {
 				if (this.vel.z > 0) cbCheck(callbacks.zpos, true, col);
 				else cbCheck(callbacks.zneg, true, col);
 				hit = true;
@@ -1537,7 +1539,7 @@ export class Collider3 extends Cube implements ICollider3 {
 //#endregion
 
 //#region ColliderN
-export interface IColliderN extends INCube {
+export interface IColliderN extends IBoxND {
 	vel: VectorN;
 	acc: VectorN;
 }
@@ -1548,8 +1550,8 @@ export type TColliderN = IColliderN;
  * Helper class for a cuboid 3D collider
  * @class
  */
-export class ColliderN extends NCube implements IColliderN {
-	static readonly IsColliderN = (obj: any): obj is TColliderN => NCube.IsNCube(obj) && typeCheck<TColliderN>(obj, "vel", "acc");
+export class ColliderN extends BoxND implements IColliderN {
+	static readonly IsColliderN = (obj: any): obj is TColliderN => BoxND.IsBoxND(obj) && typeCheck<TColliderN>(obj, "vel", "acc");
 
 	vel: VectorN;
 	acc: VectorN;
@@ -1575,7 +1577,7 @@ export class ColliderN extends NCube implements IColliderN {
 			let nextPos = VectorN.add(this.pos, { coords: this.vel.coords.map((elem, ind) => ind == dim ? elem : 0) });
 			let nextCol = new ColliderN(nextPos, this.size);
 				if (col == this) continue;
-				if (IntersectionBetween.NCubeAndNCube(col, nextCol)) {
+				if (IntersectionBetween.BoxNDAndBoxND(col, nextCol)) {
 					if (this.vel.coords[dim] > 0) cbCheck(callbacks.pos[dim], true, col);
 					else cbCheck(callbacks.neg[dim], true, col);
 					hit = true;
@@ -1611,7 +1613,7 @@ export class ColliderN extends NCube implements IColliderN {
 //#endregion
 
 //#region Button
-export interface IButton extends IBox {
+export interface IButton extends IBox2D {
 	onClick: () => any;
 }
 
@@ -1619,8 +1621,8 @@ export interface IButton extends IBox {
  * Helper class for an arbitrary button
  * @class
  */
-export class Button extends Box implements IButton {
-	static readonly IsButton = (obj: any): obj is IButton => Box.IsBox(obj) && typeCheck<IButton>(obj, "onClick");
+export class Button extends Box2D implements IButton {
+	static readonly IsButton = (obj: any): obj is IButton => Box2D.IsBox2D(obj) && typeCheck<IButton>(obj, "onClick");
 
 	onClick: () => any;
 
@@ -1630,7 +1632,7 @@ export class Button extends Box implements IButton {
 		this.onClick = onClick;
 	}
 
-	readonly wasClicked = (clickPos: IVector2): boolean => IntersectionBetween.Point2DAndBox(clickPos, this);
+	readonly wasClicked = (clickPos: IVector2): boolean => IntersectionBetween.Point2DAndBox2D(clickPos, this);
 }
 //#endregion
 
@@ -1930,9 +1932,9 @@ const MRV: number = maxVal;
 
 //#region Functions
 
-var sin = Math.sin;
-var cos = Math.cos;
-var tan = Math.tan;
+const sin = Math.sin;
+const cos = Math.cos;
+const tan = Math.tan;
 
 /**
  * Determines the minimum and maximum of an array of things of varying lengths
@@ -1960,14 +1962,14 @@ const cbCheck = (
 }
 
 const posAndSize = (
-	obj: TBox,
-	a?: number | IVector2 | TBox,
+	obj: TBox2D,
+	a?: number | IVector2 | TBox2D,
 	b?: number | IVector2,
 	c?: number | IVector2,
 	d?: number
 ): void => {
 	if (a !== undefined) {
-		if (Box.IsBox(a)) {
+		if (Box2D.IsBox2D(a)) {
 			obj.pos = a.pos;
 			obj.size = a.size;
 		} else if (Vector2.IsVector2(a)) {
@@ -2002,117 +2004,251 @@ export const padArr = (inArr: any[], targetLen: number, padStr?: string): any[] 
 
 //#region Checkers
 //#region IntersectionChecks
+
+// List
+// 2D: Point2D, LineInf2D, LineSeg2D, Box2D, Circle (25 checks, 15 unique)
+// (PO.PO ✓, PO.LI ✓, PO.LS ✓, PO.BO ✓, PO.CI ✓, LI.LI, LI.LS, LI.BO ✓, LI.CI ✓, LS.LS, LS.BO, LS.CI ✓, BO.BO ✓, BO.CI ✓, CI.CI ✓)
+
+// 3D: Point3D, LineInf3D, LineSeg3D, Box3D, SPOhere (25 checks, 15 unique)
+// (PO.PO, PO.LI, PO.LS, PO.BO ✓, PO.SP ✓, LI.LI, LI.LS, LI.BO, LI.SP ✓, LS.LS, LS.BO, LS.SP ✓, BO.BO ✓, BO.SP ✓, SP.SP ✓)
+
+// ND: PointND, Box3DND, SPhereND (9 checks, 6 unique)
+// (PO.PO, PO.BO, PO.SP, BO.BO ✓, BO.SP, SP.SP)
+
 export class IntersectionBetween {
-	//point & range
-	static readonly Point1DAndRange = (point: number, range: TRange): boolean => point > range.start && point < range.start + range.size;
 	//range & range
 	static readonly RangeAndRange = (a: TRange, b: TRange): boolean => (a.start + a.size >= b.start) && (b.start + b.size >= a.start);
+	//point & range
+	static readonly Point1DAndRange = (point: number, range: TRange): boolean => point > range.start && point < range.start + range.size;
 
-	//point & point
+	//#region 2D
+	//Point2D & Point2D
 	static readonly Point2DAndPoint2D = (pointA: TVector2, pointB: TVector2): boolean => pointA.x == pointB.x && pointA.y == pointB.y;
-	//point & line
-	static readonly Point2DAndLineInf2D = (point: TVector2, line: TLineInf2D): boolean => {
-		let pointToSourceVec: Vector2 = Vector2.sub(line.source, point);
-		return line.angle == pointToSourceVec.heading();
-	}
-	//point & line segment
+	//Point2D & Line2DInf
+	static readonly Point2DAndLineInf2D = (point: TVector2, line: TLineInf2D): boolean => line.angle == Vector2.sub(line.source, point).heading();
+	//Point2D & Line2DSeg
 	static readonly Point2DAndLineSegment2D = (point: TVector2, line: TLineSegment2D): boolean => {
-		let pointToAVec: Vector2 = Vector2.sub(line.a, point);
-		let pointToBVec: Vector2 = Vector2.sub(line.b, point);
-		let AToBVec: Vector2 = Vector2.sub(line.b, line.a);
-		let withinARange: boolean = pointToAVec.squareLength() < AToBVec.squareLength();
-		let withinBRange: boolean = pointToBVec.squareLength() < AToBVec.squareLength();
+		const pointToAVec: Vector2 = Vector2.sub(line.a, point);
+		const pointToBVec: Vector2 = Vector2.sub(line.b, point);
+		const AToBVec: Vector2 = Vector2.sub(line.b, line.a);
+		const withinARange: boolean = pointToAVec.squareLength() < AToBVec.squareLength();
+		const withinBRange: boolean = pointToBVec.squareLength() < AToBVec.squareLength();
 		return AToBVec.heading() == pointToAVec.heading() && withinARange && withinBRange;
 	}
-	//point & box
-	static readonly Point2DAndBox = (point: TVector2, box: TBox): boolean => {
-		let xRange: CRange = new CRange(box.pos.x, box.size.x);
-		let yRange: CRange = new CRange(box.pos.y, box.size.y);
-
-		return IntersectionBetween.Point1DAndRange(point.x, xRange) && IntersectionBetween.Point1DAndRange(point.y, yRange);
+	//Point2D & Box2D
+	static readonly Point2DAndBox2D = (point: TVector2, Box2D: TBox2D): boolean => {
+		const xRange: CRange = new CRange(Box2D.pos.x, Box2D.size.x);
+		const xOverlap: boolean = IntersectionBetween.Point1DAndRange(point.x, xRange);
+		const yRange: CRange = new CRange(Box2D.pos.y, Box2D.size.y);
+		const yOverlap: boolean = IntersectionBetween.Point1DAndRange(point.y, yRange);
+		return xOverlap && yOverlap;
 	}
-	//point & circle
+	//Point2D & Circle
 	static readonly Point2DAndCircle = (point: TVector2, circle: TCircle): boolean => Vector2.dist(point, circle.center) <= circle.radius;
 
-	//3D point & 3D line
-	//3D point & 3D line segment
-	//3D point & cube
-	//3D point & sphere
-
-	//line & line
-	//line & line segment
-	//line & box
-	static readonly LineInf2DAndBox = (line: TLineInf2D, box: TBox) => {
-		let boxCorners: TVector2[] = [
-			box.pos,
-			Vector2.add(box.pos, { x: box.size.x, y: 0 }),
-			Vector2.add(box.pos, { x: 0, y: box.size.y }),
-			Vector2.add(box.pos, box.size)
+	//Line2DInf & Line2DInf
+	//Line2DInf & Line2DSeg
+	//Line2DInf & Box2D
+	static readonly LineInf2DAndBox2D = (line: TLineInf2D, Box2D: TBox2D) => {
+		const Box2DCorners: TVector2[] = [
+			Box2D.pos,
+			Vector2.add(Box2D.pos, { x: Box2D.size.x, y: 0 }),
+			Vector2.add(Box2D.pos, { x: 0, y: Box2D.size.y }),
+			Vector2.add(Box2D.pos, Box2D.size)
 		];
 
-		let pointToCornerLines: TLineInf2D[] = boxCorners.map(corner => new LineInf2D(line.source, corner));
+		const pointToCornerLines: TLineInf2D[] = Box2DCorners.map(corner => new LineInf2D(line.source, corner));
 
-		let pointToCornerAngles: number[] = pointToCornerLines.map(PTCL => PTCL.angle);
+		const pointToCornerAngles: number[] = pointToCornerLines.map(PTCL => PTCL.angle);
 
-		let angleA: number = Math.max(...pointToCornerAngles);
-		let angleB: number = Math.min(...pointToCornerAngles);
+		const angleA: number = Math.max(...pointToCornerAngles);
+		const angleB: number = Math.min(...pointToCornerAngles);
 
 		return line.angle < angleA && line.angle > angleB;
 	}
-	//line & circle
-	//line & sphere
+	//Line2DInf & Circle
+	static readonly LineInf2DAndCircle = (line: TLineInf2D, circle: TCircle): boolean => {
+		const lineA: TVector2 = line.source;
+		const lineB: TVector2 = Vector2.add(line.source, Vector2.fromAngle(line.angle));
+		const center: TVector2 = circle.center;
 
-	//line segment & line segment
-	//line segment & box
-	//line segment & circle
+		// const a = (lineB.x - lineA.x) ** 2 + (lineB.y - lineA.y) ** 2;
+		// const b = 2 * ((lineB.x - lineA.x) * (lineA.x - center.x) + (lineB.y - lineA.y) * (lineA.y - center.y));
+		// const c = center.x ** 2 + center.y ** 2 + lineA.x ** 2 + lineA.y ** 2 - 2 * (center.x * lineA.x + center.y * lineA.y) - circle.radius ** 2;
 
-	//3D line & 3D line
-	//3D line & 3D line segment
-	//3D line & cube
-	//3D line & sphere
+		// const u = b ** 2 - 4 * a * c;
 
-	//3D line segment & 3D line segment
-	//3D line segment & cube
-	//3D line segment & sphere
+		// return u > 0;
 
-	//box & box
-	static readonly BoxAndBox = (a: TBox, b: TBox): boolean => {
-		let xa: CRange = new CRange(a.pos.x, a.size.x);
-		let xb: CRange = new CRange(b.pos.x, b.size.x);
-		let ya: CRange = new CRange(a.pos.y, a.size.y);
-		let yb: CRange = new CRange(b.pos.y, b.size.y);
+		const lineDX = lineB.x - lineA.x;
+		const lineDY = lineB.y - lineA.y;
+
+		const num = (center.x - lineA.x) * lineDX + (center.y - lineA.y) * lineDY;
+		const den = lineDX ** 2 + lineDY ** 2;
+
+		const u = num / den;
+
+		const p = Vector2.add(lineB, Vector2.scale(Vector2.sub(lineB, lineA), u));
+		return IntersectionBetween.Point2DAndCircle(p, circle);
+	}
+
+	//Line2DSeg & Line2DSeg
+	//Line2DSeg & Box2D
+	//Line2DSeg & Circle
+	static readonly LineSeg2DAndCircle = (line: TLineSegment2D, circle: TCircle): boolean => {
+		const center: TVector2 = circle.center;
+		const lineDX = line.b.x - line.a.x;
+		const lineDY = line.b.y - line.a.y;
+
+		const num = (center.x - line.a.x) * lineDX + (center.y - line.a.y) * lineDY;
+		const den = lineDX ** 2 + lineDY ** 2;
+
+		const u = num / den;
+
+		if(u > 0 && u < 1) {
+			const p = Vector2.add(line.a, Vector2.scale(Vector2.sub(line.b, line.a), u));
+			return IntersectionBetween.Point2DAndCircle(p, circle);
+		} else {
+			return IntersectionBetween.Point2DAndCircle(line.a, circle) || IntersectionBetween.Point2DAndCircle(line.b, circle);
+		}
+	}
+
+	//Box2D & Box2D
+	static readonly Box2DAndBox2D = (a: TBox2D, b: TBox2D): boolean => {
+		const xa: CRange = new CRange(a.pos.x, a.size.x);
+		const xb: CRange = new CRange(b.pos.x, b.size.x);
+		const ya: CRange = new CRange(a.pos.y, a.size.y);
+		const yb: CRange = new CRange(b.pos.y, b.size.y);
 
 		return (IntersectionBetween.RangeAndRange(xa, xb) && IntersectionBetween.RangeAndRange(ya, yb));
 	}
-	//box & circle
-
-	//circle & cube
-	//circle & sphere
-
-	//cube & cube
-	static readonly CubeAndCube = (a: TCube, b: TCube): boolean => {
-		let xya = new Box(new Vector2(a.pos.x, a.pos.y), new Vector2(a.size.x, a.size.y));
-		let xyb = new Box(new Vector2(b.pos.x, b.pos.y), new Vector2(b.size.x, b.size.y));
-		let xza = new Box(new Vector2(a.pos.x, a.pos.z), new Vector2(a.size.x, a.size.z));
-		let xzb = new Box(new Vector2(b.pos.x, b.pos.z), new Vector2(b.size.x, b.size.z));
-		let yza = new Box(new Vector2(a.pos.y, a.pos.z), new Vector2(a.size.y, a.size.z));
-		let yzb = new Box(new Vector2(b.pos.y, b.pos.z), new Vector2(b.size.y, b.size.z));
-
-		return (IntersectionBetween.BoxAndBox(xya, xyb) && IntersectionBetween.BoxAndBox(xza, xzb) && IntersectionBetween.BoxAndBox(yza, yzb));
+	//Box2D & Circle
+	static readonly Box2DAndCircle = (Box2D: TBox2D, circle: TCircle): boolean => {
+		const x: number = limit(circle.center.x, Box2D.pos.x, Box2D.pos.x + Box2D.size.x);
+		const y: number = limit(circle.center.y, Box2D.pos.y, Box2D.pos.y + Box2D.size.y);
+	  
+		return Vector2.dist(new Vector2(x, y), circle.center) < circle.radius;
 	}
-	//cube & sphere
 
-	//sphere & sphere
+	//Circle & Circle
+	static readonly CircleAndCircle = (a: TCircle, b: TCircle): boolean => {
+		const dist = Vector2.dist(a.center, b.center);
+		return dist < a.radius && dist < b.radius;
+	}
+	//#endregion
 
-	//NCube & NCube
-	static readonly NCubeAndNCube = (a: TNCube, b: TNCube): boolean => {
-		let aRanges: CRange[] = a.pos.coords.map((elem, ind) => new CRange(elem, a.size.coords[ind]));
-		let bRanges: CRange[] = b.pos.coords.map((elem, ind) => new CRange(elem, b.size.coords[ind]));
+	//#region 3D
+	//Point3D & Point3D
+	//Point3D & Line3DInf
+	//Point3D & Line3DSeg
+	//Point3D & Box3D
+	static readonly Point3DAndBox3D = (point: TVector3, Box3D: TBox3D): boolean => {
+		const xRange: CRange = new CRange(Box3D.pos.x, Box3D.size.x);
+		const xOverlap: boolean = IntersectionBetween.Point1DAndRange(point.x, xRange);
+		const yRange: CRange = new CRange(Box3D.pos.y, Box3D.size.y);
+		const yOverlap: boolean = IntersectionBetween.Point1DAndRange(point.y, yRange);
+		const zRange: CRange = new CRange(Box3D.pos.z, Box3D.size.z);
+		const zOverlap: boolean = IntersectionBetween.Point1DAndRange(point.z, zRange);
+		return xOverlap && yOverlap && zOverlap;
+	}
+	//Point3D & sphere
+	static readonly Point3DAndSphere = (point: TVector3, circle: TSphere): boolean => Vector3.dist(point, circle.center) <= circle.radius;
+
+	//Line3DInf & Line3D
+	//Line3DInf & Line3DSeg
+	//Line3DInf & Box3D
+	//Line3DInf & sphere
+	static readonly LineInf3DAndSphere = (line: TLineInf3D, sphere: TSphere): boolean => {
+		const lineA: TVector3 = line.source;
+		const lineB: TVector3 = Vector3.add(line.source, Vector3.fromAngle(line.angle, line.theta));
+		const center: TVector3 = sphere.center;
+
+		// const a = (lineB.x - lineA.x) ** 2 + (lineB.y - lineA.y) ** 2 + (lineB.z - lineA.z) ** 2;
+		// const b = 2 * ((lineB.x - lineA.x) * (lineA.x - center.x) + (lineB.y - lineA.y) * (lineA.y - center.y) + (lineB.z - lineA.z) * (lineA.z - center.z));
+		// const c = center.x ** 2 + center.y ** 2 + center.z ** 2 + lineA.x ** 2 + lineA.y ** 2 + lineA.z ** 2 - 2 * (center.x * lineA.x + center.y * lineA.y + center.z * lineA.z) - sphere.radius ** 2;
+
+		// const u = b ** 2 - 4 * a * c;
+
+		// return u > 0;
+
+		const lineDX = lineB.x - lineA.x;
+		const lineDY = lineB.y - lineA.y;
+		const lineDZ = lineB.z - lineA.z;
+
+		const num = (center.x - lineA.x) * lineDX + (center.y - lineA.y) * lineDY + (center.z - lineA.z) * lineDZ;
+		const den = lineDX ** 2 + lineDY ** 2 + lineDZ ** 2;
+
+		const u = num / den;
+
+		const p = Vector3.add(lineA, Vector3.scale(Vector3.sub(lineB, lineA), u));
+		return IntersectionBetween.Point3DAndSphere(p, sphere);
+	}
+
+	//Line3DSeg & Line3DSeg
+	//Line3DSeg & Box3D
+	//Line3DSeg & Sphere
+	static readonly LineSeg3DAndSphere = (line: TLineSegment3D, sphere: TSphere): boolean => {
+		const center = sphere.center;
+		const lineDX = line.b.x - line.a.x;
+		const lineDY = line.b.y - line.a.y;
+		const lineDZ = line.b.z - line.a.z;
+
+		const num = (center.x - line.a.x) * lineDX + (center.y - line.a.y) * lineDY + (center.z - line.a.z) * lineDZ;
+		const den = lineDX ** 2 + lineDY ** 2 + lineDZ ** 2;
+
+		const u = num / den;
+
+		if(u > 0 && u < 1) {
+			const p = Vector3.add(line.a, Vector3.scale(Vector3.sub(line.b, line.a), u));
+			return IntersectionBetween.Point3DAndSphere(p, sphere);
+		} else {
+			return IntersectionBetween.Point3DAndSphere(line.a, sphere) || IntersectionBetween.Point3DAndSphere(line.b, sphere);
+		}
+	}
+
+	//Box3D & Box3D
+	static readonly Box3DAndBox3D = (a: TBox3D, b: TBox3D): boolean => {
+		const xya = new Box2D(new Vector2(a.pos.x, a.pos.y), new Vector2(a.size.x, a.size.y));
+		const xyb = new Box2D(new Vector2(b.pos.x, b.pos.y), new Vector2(b.size.x, b.size.y));
+		const xza = new Box2D(new Vector2(a.pos.x, a.pos.z), new Vector2(a.size.x, a.size.z));
+		const xzb = new Box2D(new Vector2(b.pos.x, b.pos.z), new Vector2(b.size.x, b.size.z));
+		const yza = new Box2D(new Vector2(a.pos.y, a.pos.z), new Vector2(a.size.y, a.size.z));
+		const yzb = new Box2D(new Vector2(b.pos.y, b.pos.z), new Vector2(b.size.y, b.size.z));
+
+		return (IntersectionBetween.Box2DAndBox2D(xya, xyb) && IntersectionBetween.Box2DAndBox2D(xza, xzb) && IntersectionBetween.Box2DAndBox2D(yza, yzb));
+	}
+	//Box3D & Sphere
+	static readonly Box3DAndSphere = (Box3D: TBox3D, sphere: TSphere): boolean => {
+		const x: number = limit(sphere.center.x, Box3D.pos.x, Box3D.pos.x + Box3D.size.x);
+		const y: number = limit(sphere.center.y, Box3D.pos.y, Box3D.pos.y + Box3D.size.y);
+		const z: number = limit(sphere.center.z, Box3D.pos.z, Box3D.pos.z + Box3D.size.z);
+	  
+		return Vector3.dist(new Vector3(x, y, z), sphere.center) < sphere.radius;
+	}
+
+	//Sphere & Sphere
+	static readonly SphereAndSphere = (a: TSphere, b: TSphere): boolean => {
+		const dist = Vector3.dist(a.center, b.center);
+		return dist < a.radius && dist < b.radius;
+	}
+	//#endregion
+
+	//#region ND
+	//PointND & PointND
+	//PointND & BoxND
+	//PointND & SphereND
+	//BoxND & BoxND
+	static readonly BoxNDAndBoxND = (a: TBoxND, b: TBoxND): boolean => {
+		const aRanges: CRange[] = a.pos.coords.map((elem, ind) => new CRange(elem, a.size.coords[ind]));
+		const bRanges: CRange[] = b.pos.coords.map((elem, ind) => new CRange(elem, b.size.coords[ind]));
 
 		let overlap: boolean = true;
 		aRanges.forEach((elem, ind) => {if(!IntersectionBetween.RangeAndRange(elem, bRanges[ind])) overlap = false;});
 		return overlap;
 	}
+	//Box3DND & SphereND
+	//SphereND & SphereND
+	//#endregion
 }
 //#endregion
 
@@ -2141,7 +2277,7 @@ export const isLimited = (limitee: number, ...minMaxIn: number[]): boolean => {
 
 //#region Math
 /** The logarithm of a number with an arbitrary base */
-export const logb= (val: number, base: number): number => Math.log(val) / Math.log(base);
+export const logb = (val: number, base: number): number => Math.log(val) / Math.log(base);
 
 /** Return the greatest common denominator */
 export const gcd = (a: number, b: number): number => {
