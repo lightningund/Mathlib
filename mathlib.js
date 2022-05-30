@@ -1043,15 +1043,15 @@ export class Card {
         this.suit = Card.SUITS[this.suitI];
         this.name = this.num + this.suit;
         this.sprite = new Image(1000, 1000);
-        this.sprite.src = "https://lightningund.github.io/Methlib/Images/" + this.suit + this.num + ".png";
+        this.sprite.src = "https://lightningund.github.io/Mathlib/Images/" + this.suit + this.num + ".png";
     }
 }
 Card.IsCard = (obj) => typeCheck(obj, "numI", "suitI", "num", "suit", "name", "flipped", "sprite");
 Card.SUITS = ['C', 'S', 'H', 'D'];
 Card.CARDVALS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-Card.cardBack = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Back.png");
-Card.cardHighlight = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Highlight.png");
-Card.cardOutline = ImageFromSrc("https://lightningund.github.io/Methlib/Images/Outline.png");
+Card.cardBack = ImageFromSrc("https://lightningund.github.io/Mathlib/Images/Back.png");
+Card.cardHighlight = ImageFromSrc("https://lightningund.github.io/Mathlib/Images/Highlight.png");
+Card.cardOutline = ImageFromSrc("https://lightningund.github.io/Mathlib/Images/Outline.png");
 Card.getVal = (card) => {
     switch (card.num) {
         case "A":
